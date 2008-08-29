@@ -19,7 +19,6 @@ module DataMapper
       # fired when your plugin gets included into Resource
       #
       def self.included(base)
-
       end
 
       ##
@@ -59,6 +58,12 @@ module DataMapper
 
       module ClassMethods
         attr_reader :slug_options
+
+        # override the old get method so that it looks for slugs first
+        # and call the old get if slug is not found
+        def get(*key)
+          first(:slug => key[0]) || super(*key)
+        end
         
         def permanent_slug?
           slug_options[:permanent_slug]
@@ -79,6 +84,7 @@ module DataMapper
       end # ClassMethods
 
       module InstanceMethods
+        
         
         def permanent_slug?
           self.class.permanent_slug?

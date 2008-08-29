@@ -129,5 +129,11 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       post_slug_property.size.should == 2000     
     end
     
+    it "should find model with get method" do
+      u = User.get("john")
+      u.should_not be_nil
+      u.should == @u1
+    end
+    
   end
 end
