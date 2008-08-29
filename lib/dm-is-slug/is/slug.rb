@@ -122,8 +122,11 @@ module DataMapper
         # override the old get method so that it looks for slugs first
         # and call the old get if slug is not found
         def get_with_slug(*key)
-          puts "==============#{key.inspect}"
-          first(:slug => key[0]) || get_without_slug(*key)
+          if respond_to?(:slug_options) && slug_options
+            return first(:slug => key[0]) || get_without_slug(*key)
+          end
+          
+          get_without_slug(*key)
         end
         
         ##

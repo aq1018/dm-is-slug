@@ -10,6 +10,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       property :id, Serial
       property :email, String
       has n, :posts
+      has n, :todos
       
       def slug_for_email
         email.split("@").first
@@ -30,9 +31,18 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       is :slug, :source => :title
     end
     
+    class Todo
+      include DataMapper::Resource
+      property :id, Serial
+      property :title, String
+      
+      belongs_to :user
+    end
+    
     before :all do
       User.auto_migrate!(:default)
       Post.auto_migrate!(:default)
+      Todo.auto_migrate!(:default)
 
       @u1 = User.create(:email => "john@ekohe.com")
       @p1 = Post.create(:user => @u1, :title => "My first shinny blog post")
@@ -129,11 +139,12 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       post_slug_property.size.should == 2000     
     end
     
-    it "should find model with get method" do
+    it "should find model using get method with slug" do
       u = User.get("john")
       u.should_not be_nil
       u.should == @u1
-      # test for collections
+      
+      Post.get("my-first-shinny-blog-post").should == @p1
       @u1.posts.get("my-first-shinny-blog-post").should == @p1
     end
     
@@ -141,6 +152,23 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @u1.to_param.should == ["john"]
       @p1.to_param.should == ["my-first-shinny-blog-post"]
     end
+    
+    it "should find model using get method using id" do
+      u = User.get(@u1.id)
+      u.should_not be_nil
+      u.should == @u1
+
+      Post.get("my-first-shinny-blog-post").should == @p1
+      @u1.posts.get("my-first-shinny-blog-post").should == @p1
+    end
+    
+    it "should find model using get method using id with non-slug models" do
+      todo = Todo.create(:user => @u1, :title => "blabla")
+      todo.should_not be_nil
+
+      Todo.get(todo.id).should == todo
+      @u1.todos.get(todo.id).should == todo
+    end    
     
   end
 end
