@@ -27,7 +27,7 @@ SUDO  = WIN32 ? '' : ('sudo' unless ENV['SUDOLESS'])
 
 desc "Install #{GEM_NAME} #{GEM_VERSION}"
 task :install => [ :package ] do
-  sh "#{SUDO} gem install --local pkg/#{GEM_NAME}-#{GEM_VERSION} --no-update-sources", :verbose => false
+  sh "#{SUDO} gem install --local pkg/#{GEM_NAME}-#{GEM_VERSION} --no-update-sources", :verbose => true
 end
 
 desc "Uninstall #{GEM_NAME} #{GEM_VERSION} (default ruby)"
