@@ -118,5 +118,16 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       post.destroy
     end
     
+    it "should have the right size for properties" do
+      user_slug_property = User.properties.detect{|p| p.name == :slug && p.type == String}
+      user_slug_property.should_not be_nil
+      user_slug_property.size.should == 80
+      
+      Post.properties.detect{|p| p.name == :title && p.type == String}.size.should == 2000
+      post_slug_property = Post.properties.detect{|p| p.name == :slug && p.type == String}
+      post_slug_property.should_not be_nil
+      post_slug_property.size.should == 2000     
+    end
+    
   end
 end

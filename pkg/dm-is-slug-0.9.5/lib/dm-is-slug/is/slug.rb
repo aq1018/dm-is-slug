@@ -40,8 +40,7 @@ module DataMapper
         raise Exception.new("You must specify a :source to generate slug") unless options.include?(:source)
         
         # make sure the source property exsists
-        source_property = properties.detect{|p| p.name == :slug && p.type == String}
-                
+        source_property = properties.detect{|p| p.name == options[:source].to_sym && p.type == String}
         # find the string length so that slug can adapt size dynamically depending on the source property
         options[:size] ||= source_property.size if source_property
         
