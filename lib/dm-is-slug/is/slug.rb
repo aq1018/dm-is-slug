@@ -85,6 +85,9 @@ module DataMapper
 
       module InstanceMethods
         
+        def to_param
+          [slug]
+        end
         
         def permanent_slug?
           self.class.permanent_slug?

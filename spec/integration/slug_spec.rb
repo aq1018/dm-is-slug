@@ -135,5 +135,10 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       u.should == @u1
     end
     
+    it "should output slug with to_param method" do
+      @u1.to_param.should == ["john"]
+      @p1.to_param.should == ["my-first-shinny-blog-post"]
+    end
+    
   end
 end
