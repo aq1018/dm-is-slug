@@ -133,6 +133,8 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       u = User.get("john")
       u.should_not be_nil
       u.should == @u1
+      # test for collections
+      @u1.posts.get("my-first-shinny-blog-post").should == @p1
     end
     
     it "should output slug with to_param method" do

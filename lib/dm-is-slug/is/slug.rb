@@ -58,12 +58,6 @@ module DataMapper
 
       module ClassMethods
         attr_reader :slug_options
-
-        # override the old get method so that it looks for slugs first
-        # and call the old get if slug is not found
-        def get(*key)
-          first(:slug => key[0]) || super(*key)
-        end
         
         def permanent_slug?
           slug_options[:permanent_slug]
@@ -123,6 +117,24 @@ module DataMapper
           end
         end
       end # InstanceMethods
+      
+      module AliasMethods
+        # override the old get method so that it looks for slugs first
+        # and call the old get if slug is not found
+        def get_with_slug(*key)
+          puts "==============#{key.inspect}"
+          first(:slug => key[0]) || get_without_slug(*key)
+        end
+        
+        ##
+        # fired when your plugin gets included into Resource
+        #
+        def self.included(base)
+          base.send :alias_method, :get_without_slug, :get
+          base.send :alias_method, :get, :get_with_slug
+        end
+      end
+      
     end # Slug
   end # Is
 end # DataMapper
