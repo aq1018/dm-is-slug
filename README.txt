@@ -4,7 +4,10 @@ DataMapper plugin for creating and slugs(permalinks).
 
 == Installation
 
-Download dm-more and put dm-is-slug inside dm-more directory.
+NOTE: You no longer need to download dm-more source code in order to install
+this.
+
+All you need to do is:
 
 $ sudo rake install
 
