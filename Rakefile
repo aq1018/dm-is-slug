@@ -8,8 +8,8 @@ require 'pathname'
 ROOT = Pathname(__FILE__).dirname.expand_path
 require ROOT + 'lib/dm-is-slug/is/version'
 
-AUTHOR = "Aaron Qian"
-EMAIL  = "aaron [a] ekohe [d] com"
+AUTHOR = "Aaron Qian, Nik Radford"
+EMAIL  = "aaron [a] ekohe [d] com; nik [a] terminaldischarge [d] net"
 GEM_NAME = "dm-is-slug"
 GEM_VERSION = DataMapper::Is::Slug::VERSION
 GEM_DEPENDENCIES = [["dm-core", GEM_VERSION]]
