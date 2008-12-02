@@ -18,7 +18,7 @@ PROJECT_NAME = "datamapper"
 PROJECT_URL  = "http://github.com/aq1018/dm-is-slug"
 PROJECT_DESCRIPTION = PROJECT_SUMMARY = "DataMapper plugin that generates unique slugs"
 
-require ROOT.parent + 'tasks/hoe'
+require 'tasks/hoe'
 
 task :default => [ :spec ]
 
