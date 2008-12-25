@@ -59,12 +59,11 @@ module DataMapper
           p.name == options[:source].to_sym && p.type == String
         end
 
-        # find the string length so that slug can adapt size dynamically 
-        # depending on the source property
-        options[:size] ||= source_property.size if source_property
-        
-        # if the source is not a property and no size is given, we use default
-        options[:size] ||= DataMapper::Is::Slug.default_slug_size
+        # Find the string length so that slug can adapt size dynamically 
+        # depending on the source property, or use the default slug size.
+        options[:size] ||= source_property &&
+                             source_property.size ||
+                             DataMapper::Is::Slug.default_slug_size
         
         # save as class variable for later...
         @slug_options = options
