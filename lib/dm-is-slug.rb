@@ -9,7 +9,6 @@ require 'dm-core'
 # Require plugin-files
 require Pathname(__FILE__).dirname.expand_path / 'dm-is-slug' / 'is' / 'slug.rb'
 
-
 # Include the plugin in Resource
 module DataMapper
   module Resource
@@ -30,6 +29,5 @@ module DataMapper
   class Collection
     include DataMapper::Is::Slug::AliasMethods
   end
-  
 end
 
