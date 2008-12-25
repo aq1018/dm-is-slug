@@ -1,8 +1,6 @@
 module DataMapper
   module Is
     module Slug
-      
-      # OPTIMIZE Kinda slow compared to a constant
       def self.default_slug_size
         50
       end
