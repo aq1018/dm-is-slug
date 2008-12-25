@@ -31,9 +31,7 @@ module DataMapper
         options = { :permanent_slug => true }.merge(options)
         
         # must at least specify a source property to generate the slug
-        #--
-        # TODO Remove explicit Exception class usage
-        raise Exception.new("You must specify a :source to generate slug") unless options.include?(:source)
+        raise 'You must specify a :source to generate slug' unless options.include?(:source)
         
         # make sure the source property exsists
         source_property = properties.detect{|p| p.name == options[:source].to_sym && p.type == String}
@@ -99,8 +97,7 @@ module DataMapper
         def generate_slug
           source = self.send(slug_source)
           
-          # TODO Remove explicit Exception class usage and brackets
-          raise Exception.new(":source is invalid!") unless(slug_source_property || self.respond_to?(slug_source) )
+          raise ':source is invalid!' unless slug_source_property || self.respond_to?(slug_source)
                               
           # TODO Remove superfluous brackets
           return if (permanent_slug? && self.slug) || source.nil?
