@@ -51,7 +51,8 @@ module DataMapper
         options = { :permanent_slug => true }.merge(options)
         
         # must at least specify a source property to generate the slug
-        raise 'You must specify a :source to generate slug' unless options.include?(:source)
+#        raise 'You must specify a :source to generate slug' unless options.include?(:source)
+        raise 'You must specify a :source to generate slug' unless options[:source]
         
         # make sure the source property exsists
         source_property = properties.detect do |p|
