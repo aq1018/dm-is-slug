@@ -122,8 +122,9 @@ module DataMapper
         def get_with_slug(*key)
           if respond_to?(:slug_options) && slug_options && key[0].to_s.to_i.to_s != key[0].to_s
             first(:slug => key[0])
+          else
+            get_without_slug(*key)
           end
-          get_without_slug(*key)
         end
         
         ##
