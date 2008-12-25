@@ -54,8 +54,12 @@ module DataMapper
         raise 'You must specify a :source to generate slug' unless options.include?(:source)
         
         # make sure the source property exsists
-        source_property = properties.detect{|p| p.name == options[:source].to_sym && p.type == String}
-        # find the string length so that slug can adapt size dynamically depending on the source property
+        source_property = properties.detect do |p|
+          p.name == options[:source].to_sym && p.type == String
+        end
+
+        # find the string length so that slug can adapt size dynamically 
+        # depending on the source property
         options[:size] ||= source_property.size if source_property
         
         # if the source is not a property and no size is given, we use default
@@ -89,11 +93,9 @@ module DataMapper
         def slug_property
           properties.detect{|p| p.name == :slug && p.type == String}
         end
-        
       end # ClassMethods
 
       module InstanceMethods
-        
         def to_param
           [slug]
         end
@@ -127,12 +129,11 @@ module DataMapper
           # The rest of the code here is to ensure uniqueness of the slug. The 
           # methodology used sucks.
 
-          # TODO clean up uniqueness code
           self.slug = "#{self.slug}-2" if self.class.first(:slug => self.slug)
 
           while self.class.first(:slug => self.slug) != nil
             i = self.slug[-1..-1].to_i + 1
-            self.slug = self.slug[0..-2]+i.to_s
+            self.slug = self.slug[0..-2] + i.to_s
           end
         end
       end # InstanceMethods
@@ -150,15 +151,11 @@ module DataMapper
         
         ##
         # fired when your plugin gets included into Resource
-        #
-        #--
-        # TODO This stuff looks fishy and eerily similar to AMC
         def self.included(base)
           base.send :alias_method, :get_without_slug, :get
           base.send :alias_method, :get, :get_with_slug
         end
       end
-      
     end # Slug
   end # Is
 end # DataMapper
