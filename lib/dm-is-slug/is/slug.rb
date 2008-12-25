@@ -97,8 +97,7 @@ module DataMapper
           
           raise ':source is invalid!' unless slug_source_property || self.respond_to?(slug_source)
                               
-          # TODO Remove superfluous brackets
-          return if (permanent_slug? && self.slug) || source.nil?
+          return if permanent_slug? && self.slug || source.nil?
           
           # we turn the source into a slug here
           self.slug = DataMapper::Is::Slug.escape(source)
@@ -109,7 +108,7 @@ module DataMapper
           # TODO clean up uniqueness code
           self.slug = "#{self.slug}-2" if self.class.first(:slug => self.slug)
 
-          while(self.class.first(:slug => self.slug)!=nil)
+          while self.class.first(:slug => self.slug) != nil
             i = self.slug[-1..-1].to_i + 1
             self.slug = self.slug[0..-2]+i.to_s
           end
