@@ -63,6 +63,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @p14 = Post.create(:user => @u2, :title => "another productive day!!")
       @p15 = Post.create(:user => @u2, :title => "another productive day!!")
       @p16 = Post.create(:user => @u2, :title => "another productive day!!")
+      @p17 = Post.create(:user => @u2, :title => "A fancy café")
     end
  
     it "should generate slugs" do
@@ -168,6 +169,10 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
 
       Todo.get(todo.id).should == todo
       @u1.todos.get(todo.id).should == todo
+    end
+
+    it 'should strip unicode characters from the slug' do
+      @p17.slug.should == 'a-fancy-caf-e'
     end
   end
 end

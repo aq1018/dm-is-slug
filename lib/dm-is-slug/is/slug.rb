@@ -5,9 +5,11 @@ module DataMapper
         50
       end
       
-      # TODO Add Iconv escaping
+      # @param [String] str A string to escape for use as a slug
+      # @return [String] an URL-safe string
       def self.escape(str)
-        s = str.gsub(/\W+/, ' ')
+        s = Iconv.conv('ascii//translit//IGNORE', 'utf-8', str)
+        s.gsub!(/\W+/, ' ')
         s.strip!
         s.downcase!
         s.gsub!(/\ +/, '-')

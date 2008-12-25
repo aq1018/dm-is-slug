@@ -1,6 +1,7 @@
 # Needed to import datamapper and other gems
 require 'rubygems'
 require 'pathname'
+require 'iconv'
 
 # Add all external dependencies for the plugin here
 gem 'dm-core', '~>0.9.7'
