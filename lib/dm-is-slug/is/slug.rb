@@ -15,16 +15,7 @@ module DataMapper
         s.gsub!(/\ +/, '-')
         s
       end
-
       
-      ##
-      # fired when your plugin gets included into Resource
-      #
-      #--
-      # TODO Is this necessary? It's completely empty
-      def self.included(base)
-      end
-
       ##
       # Methods that should be included in DataMapper::Model.
       # Normally this should just be your generator, so that the namespace
