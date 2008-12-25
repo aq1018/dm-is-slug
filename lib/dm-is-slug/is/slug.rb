@@ -23,6 +23,26 @@ module DataMapper
       # in the specific resources when you fire is :slug
       ##
 
+      # Defines a +slug+ property on your model with the same size as your 
+      # source property. This property is Unicode escaped, and treated so as 
+      # to be fit for use in URLs.
+      #
+      # ==== Example
+      # Suppose your source attribute was the following string: "Hot deals on 
+      # Boxing Day". This string would be escaped to "hot-deals-on-boxing-day".
+      #
+      # Non-ASCII characters are attempted to be converted to their nearest 
+      # approximate.
+      #
+      # ==== Parameters
+      # +permanent_slug+::
+      #   Permanent slugs are not changed even if the source property has
+      # +source+::
+      #   The property on the model to use as the source of the generated slug
+      # +size+::
+      #   The length of the +slug+ property
+      #
+      # @param [Hash] provide options in a Hash. See *Parameters* for details
       def is_slug(options)
         extend  DataMapper::Is::Slug::ClassMethods
         include DataMapper::Is::Slug::InstanceMethods
