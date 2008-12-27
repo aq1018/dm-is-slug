@@ -1,9 +1,7 @@
 module DataMapper
   module Is
     module Slug
-      def self.default_slug_size
-        50
-      end
+      DEFAULT_SLUG_SIZE = 50
       
       # @param [String] str A string to escape for use as a slug
       # @return [String] an URL-safe string
@@ -63,7 +61,7 @@ module DataMapper
         # depending on the source property, or use the default slug size.
         options[:size] ||= source_property &&
                              source_property.size ||
-                             DataMapper::Is::Slug.default_slug_size
+                             DataMapper::Is::Slug::DEFAULT_SLUG_SIZE
         
         # save as class variable for later...
         @slug_options = options
