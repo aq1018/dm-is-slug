@@ -85,11 +85,19 @@ module DataMapper
         end
         
         def slug_source_property
-          properties.detect{|p| p.name == slug_source && p.type == String}        
+          detect_slug_property_by_name(slug_source)
         end
         
         def slug_property
-          properties.detect{|p| p.name == :slug && p.type == String}
+          detect_slug_property_by_name(:slug)
+        end
+
+        private
+
+        def detect_slug_property_by_name(name)
+          properties.detect do |p|
+            p.name == name && p.type == String
+          end
         end
       end # ClassMethods
 
