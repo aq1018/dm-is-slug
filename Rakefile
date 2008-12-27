@@ -51,6 +51,7 @@ Spec::Rake::SpecTask.new(:spec) do |t|
     t.rcov_opts << '--text-summary'
     t.rcov_opts << '--sort' << 'coverage' << '--sort-reverse'
   rescue Exception
-    # rcov not installed
+    puts 'rcov is not installed. Please install before continuing'
+    exit
   end
 end
