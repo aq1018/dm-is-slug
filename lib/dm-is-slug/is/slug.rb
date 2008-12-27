@@ -132,9 +132,6 @@ module DataMapper
           # we turn the source into a slug here
           self.slug = DataMapper::Is::Slug.escape(source)
           
-          # The rest of the code here is to ensure uniqueness of the slug. The 
-          # methodology used sucks.
-
           self.slug = "#{self.slug}-2" if self.class.first(:slug => self.slug)
 
           while self.class.first(:slug => self.slug) != nil
