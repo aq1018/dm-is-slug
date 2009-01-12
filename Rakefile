@@ -16,7 +16,7 @@ GEM_DEPENDENCIES = [["dm-core", "~>0.9"]]
 GEM_CLEAN = ["log", "pkg"]
 GEM_EXTRAS = { :has_rdoc => false }
  
-PROJECT_NAME = "datamapper"
+PROJECT_NAME = "dm-is-slug"
 PROJECT_URL  = "http://github.com/aq1018/dm-is-slug"
 PROJECT_DESCRIPTION = PROJECT_SUMMARY = "DataMapper plugin that generates unique slugs"
 
