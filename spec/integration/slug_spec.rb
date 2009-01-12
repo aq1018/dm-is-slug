@@ -113,6 +113,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
  
       user.email = "changed@ekohe.com"
       user.should be_dirty
+
       user.save.should be_true
       user.slug.should == "changed"
       user.destroy
@@ -155,12 +156,9 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     end
  
     it "should find model using get method using id" do
-      u = User.get(@u1.id)
+      u = User.get(@u1.id)      
       u.should_not be_nil
       u.should == @u1
-
-      Post.get("my-first-shinny-blog-post").should == @p1
-      @u1.posts.get("my-first-shinny-blog-post").should == @p1
     end
  
     it "should find model using get method using id with non-slug models" do

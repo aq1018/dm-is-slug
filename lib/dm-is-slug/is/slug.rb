@@ -1,7 +1,14 @@
 module DataMapper
   module Is
     module Slug
+      class InvalidSlugSource < Exception
+      end
+      
       DEFAULT_SLUG_SIZE = 50
+      
+      DEFAULT_SLUG_OPTIONS = {
+        :permanent_slug => true
+      }
       
       # @param [String] str A string to escape for use as a slug
       # @return [String] an URL-safe string
@@ -36,7 +43,9 @@ module DataMapper
       # +permanent_slug+::
       #   Permanent slugs are not changed even if the source property has
       # +source+::
-      #   The property on the model to use as the source of the generated slug
+      #   The property on the model to use as the source of the generated slug,
+      #   or an instance method defined in the model, the method must return
+      #   a string or nil.
       # +size+::
       #   The length of the +slug+ property
       #
@@ -45,31 +54,11 @@ module DataMapper
         extend  DataMapper::Is::Slug::ClassMethods
         include DataMapper::Is::Slug::InstanceMethods
         
-        # merge in default options
-        options = { :permanent_slug => true }.merge(options)
-        
-        # must at least specify a source property to generate the slug
-#        raise 'You must specify a :source to generate slug' unless options.include?(:source)
-        raise 'You must specify a :source to generate slug' unless options[:source]
-        
-        # make sure the source property exsists
-        source_property = properties.detect do |p|
-          p.name == options[:source].to_sym && p.type == String
-        end
+        @slug_options = DEFAULT_SLUG_OPTIONS.merge(options)
+        raise InvalidSlugSource('You must specify a :source to generate slug.') unless slug_source
 
-        # Find the string length so that slug can adapt size dynamically 
-        # depending on the source property, or use the default slug size.
-        options[:size] ||= source_property &&
-                             source_property.size ||
-                             DataMapper::Is::Slug::DEFAULT_SLUG_SIZE
-        
-        # save as class variable for later...
-        @slug_options = options
-        
-        unless slug_property
-          property :slug, String, :size => options[:size], :unique => true
-        end
-         
+        slug_options[:size] ||= get_slug_size
+        property(:slug, String, :size => slug_options[:size], :unique => true) unless slug_property
         before :save, :generate_slug
       end
 
@@ -81,7 +70,7 @@ module DataMapper
         end
         
         def slug_source
-          slug_options[:source].to_sym
+          slug_options[:source] ? slug_options[:source].to_sym : nil
         end
         
         def slug_source_property
@@ -98,6 +87,10 @@ module DataMapper
           properties.detect do |p|
             p.name == name && p.type == String
           end
+        end
+        
+        def get_slug_size
+          slug_source_property && slug_source_property.size || DataMapper::Is::Slug::DEFAULT_SLUG_SIZE
         end
       end # ClassMethods
 
@@ -122,22 +115,34 @@ module DataMapper
           self.class.slug_property
         end
         
-        def generate_slug
-          source = self.send(slug_source)
-          
-          raise ':source is invalid!' unless slug_source_property || self.respond_to?(slug_source)
-                              
-          return if permanent_slug? && self.slug || source.nil?
-          
-          # we turn the source into a slug here
-          self.slug = DataMapper::Is::Slug.escape(source)
-          
-          self.slug = "#{self.slug}-2" if self.class.first(:slug => self.slug)
+        def slug_source_value
+          self.send(slug_source)
+        end
+        
+        # The slug is not stale if 
+        # 1. the slug is permanent, and slug column has something valid in it
+        # 2. the slug source value is nil or empty
+        def stale_slug?
+          !((permanent_slug? && slug && !slug.empty?) || (slug_source_value.nil? || slug_source_value.empty?))
+        end
+        
+        private
+                
+        def make_unique_slug!
+          unique_slug = DataMapper::Is::Slug.escape(slug_source_value)
+          unique_slug = "#{unique_slug}-2" if self.class.first(:slug => unique_slug)
 
-          while self.class.first(:slug => self.slug) != nil
-            i = self.slug[-1..-1].to_i + 1
-            self.slug = self.slug[0..-2] + i.to_s
+          while(self.class.first(:slug => unique_slug))
+            i = unique_slug[-1..-1].to_i + 1
+            unique_slug = unique_slug[0..-2] + i.to_s
           end
+          unique_slug
+        end
+        
+        def generate_slug
+          raise InvalidSlugSource('Invalid slug source.') unless slug_source_property || self.respond_to?(slug_source)
+          return unless stale_slug?
+          self.slug = make_unique_slug!
         end
       end # InstanceMethods
       
