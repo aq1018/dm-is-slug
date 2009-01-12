@@ -20,10 +20,7 @@ PROJECT_NAME = "datamapper"
 PROJECT_URL  = "http://github.com/aq1018/dm-is-slug"
 PROJECT_DESCRIPTION = PROJECT_SUMMARY = "DataMapper plugin that generates unique slugs"
 
-Hoe.new('dm-is-slug', DataMapper::Is::Slug::VERSION) do |p|
-  p.rubyforge_name = 'dm-is-slug' # if different than lowercase project name
-  p.developer('Aaron Qian', 'aaron [a] ekohe [d] com')
-end
+require 'tasks/hoe'
 
 task :default => [ :spec ]
  
