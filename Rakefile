@@ -12,7 +12,7 @@ AUTHOR = "Aaron Qian, Nik Radford"
 EMAIL  = "aaron [a] ekohe [d] com; nik [a] terminaldischarge [d] net"
 GEM_NAME = "dm-is-slug"
 GEM_VERSION = DataMapper::Is::Slug::VERSION
-GEM_DEPENDENCIES = [["dm-core", GEM_VERSION]]
+GEM_DEPENDENCIES = [["dm-core", "~>0.9"]]
 GEM_CLEAN = ["log", "pkg"]
 GEM_EXTRAS = { :has_rdoc => false }
  
