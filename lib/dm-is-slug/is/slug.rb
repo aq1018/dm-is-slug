@@ -1,9 +1,7 @@
 module DataMapper
   module Is
     module Slug
-      def self.default_slug_size
-        50
-      end
+      DEFAULT_SLUG_SIZE = 50
       
       # @param [String] str A string to escape for use as a slug
       # @return [String] an URL-safe string
@@ -63,7 +61,7 @@ module DataMapper
         # depending on the source property, or use the default slug size.
         options[:size] ||= source_property &&
                              source_property.size ||
-                             DataMapper::Is::Slug.default_slug_size
+                             DataMapper::Is::Slug::DEFAULT_SLUG_SIZE
         
         # save as class variable for later...
         @slug_options = options
@@ -87,11 +85,19 @@ module DataMapper
         end
         
         def slug_source_property
-          properties.detect{|p| p.name == slug_source && p.type == String}        
+          detect_slug_property_by_name(slug_source)
         end
         
         def slug_property
-          properties.detect{|p| p.name == :slug && p.type == String}
+          detect_slug_property_by_name(:slug)
+        end
+
+        private
+
+        def detect_slug_property_by_name(name)
+          properties.detect do |p|
+            p.name == name && p.type == String
+          end
         end
       end # ClassMethods
 
@@ -126,9 +132,6 @@ module DataMapper
           # we turn the source into a slug here
           self.slug = DataMapper::Is::Slug.escape(source)
           
-          # The rest of the code here is to ensure uniqueness of the slug. The 
-          # methodology used sucks.
-
           self.slug = "#{self.slug}-2" if self.class.first(:slug => self.slug)
 
           while self.class.first(:slug => self.slug) != nil
