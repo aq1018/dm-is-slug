@@ -174,5 +174,9 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     it 'should strip unicode characters from the slug' do
       @p17.slug.should == 'a-fancy-caf-e'
     end
+    
+    it 'should have slug_property on instance' do
+      @p1.slug_property.should == @p1.class.properties.detect{|p| p.name == :slug}
+    end
   end
 end
