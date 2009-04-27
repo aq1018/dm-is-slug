@@ -129,12 +129,13 @@ module DataMapper
         private
                 
         def make_unique_slug!
-          unique_slug = DataMapper::Is::Slug.escape(slug_source_value)
-          unique_slug = "#{unique_slug}-2" if self.class.first(:slug => unique_slug)
+          base_slug = DataMapper::Is::Slug.escape(slug_source_value)
+          i = 1
+          unique_slug = base_slug
 
-          while(self.class.first(:slug => unique_slug))
-            i = unique_slug[-1..-1].to_i + 1
-            unique_slug = unique_slug[0..-2] + i.to_s
+          while (self.class.first(:slug => unique_slug))
+            i = i + 1
+            unique_slug = "#{base_slug}-#{i}"
           end
           unique_slug
         end

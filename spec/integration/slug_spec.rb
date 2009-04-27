@@ -64,6 +64,9 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @p15 = Post.create(:user => @u2, :title => "another productive day!!")
       @p16 = Post.create(:user => @u2, :title => "another productive day!!")
       @p17 = Post.create(:user => @u2, :title => "A fancy café")
+      (1..20).each do |i|
+        instance_variable_set "@p_#{i}".to_sym, Post.create(:user => @u2, :title => "DM tricks")
+      end
     end
  
     it "should generate slugs" do
@@ -103,6 +106,10 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @p14.slug.should == "another-productive-day-9"
       @p15.slug.should == "another-productive-day-10"
       @p16.slug.should == "another-productive-day-11"
+      @p_1.slug.should == 'dm-tricks'
+      (2..20).each do |i|
+        instance_variable_get("@p_#{i}".to_sym).slug.should == "dm-tricks-#{i}"
+      end
     end
  
     it "should update slug if :permanent_slug => :false is specified" do
@@ -170,11 +177,15 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     end
 
     it 'should strip unicode characters from the slug' do
-      @p17.slug.should == 'a-fancy-caf-e'
+      @p17.slug.should == 'a-fancy-caf'
     end
     
     it 'should have slug_property on instance' do
       @p1.slug_property.should == @p1.class.properties.detect{|p| p.name == :slug}
+    end
+
+    it 'should properly increment slug suffix' do
+      @p_20.slug.should == 'dm-tricks-20'
     end
   end
 end
