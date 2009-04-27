@@ -28,7 +28,7 @@ module DataMapper
   module Model
     include DataMapper::Is::Slug::AliasMethods
   end
-  
+
   class Collection
     include DataMapper::Is::Slug::AliasMethods
   end
