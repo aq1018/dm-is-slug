@@ -1,5 +1,5 @@
 require 'rubygems'
-gem 'rspec', '~>1.1.3'
+gem 'rspec', '~>1.2.6'
 require 'spec'
 require 'pathname'
 require Pathname(__FILE__).dirname.expand_path.parent + 'lib/dm-is-slug'
