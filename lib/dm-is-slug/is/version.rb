@@ -1,7 +1,7 @@
 module DataMapper
   module Is
     module Slug
-      VERSION = "0.9.9"
+      VERSION = "0.9.11"
     end
   end
 end
