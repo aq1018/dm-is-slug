@@ -3,26 +3,26 @@ Gem::Specification.new do |s|
   s.version = "0.9.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Aaron Qian, Nik Radford"]
-  s.date = "2009-01-12"
+  s.authors = ['Aaron Qian', 'James Herdman', 'Nik Radford', 'Paul', 'Mike Frawley', 'Alex Makuta']
+  s.date = "2009-06-02"
   s.description = "DataMapper plugin that generates unique permalinks / slugs"
-  s.email = ["aaron [a] ekohe [d] com; nik [a] terminaldischarge [d] net"]
+  s.email = ['aaron [a] ekohe [d] com', 'james.herdman@gmail.com', 'nik [a] terminaldischarge [d] net', 'maverick.stoklosa@gmail.com', 'frawl021@gmail.com', 'cheba@pointlessone.org']
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt"]
   s.files = [
-    "History.txt", 
-    "LICENSE", 
-    "Manifest.txt", 
-    "README.txt", 
-    "Rakefile", 
-    "TODO", 
-    "lib/dm-is-slug.rb", 
-    "lib/dm-is-slug/is/slug.rb", 
-    "lib/dm-is-slug/is/version.rb", 
-    "spec/integration/slug_spec.rb", 
-    "spec/spec.opts", 
+    "History.txt",
+    "LICENSE",
+    "Manifest.txt",
+    "README.txt",
+    "Rakefile",
+    "TODO",
+    "lib/dm-is-slug.rb",
+    "lib/dm-is-slug/is/slug.rb",
+    "lib/dm-is-slug/is/version.rb",
+    "spec/integration/slug_spec.rb",
+    "spec/spec.opts",
     "spec/spec_helper.rb"
   ]
-  
+
   s.homepage = "http://github.com/aq1018/dm-is-slug"
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
