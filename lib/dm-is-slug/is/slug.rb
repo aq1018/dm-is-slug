@@ -158,10 +158,15 @@ module DataMapper
         # override the old get method so that it looks for slugs first
         # and call the old get if slug is not found
         def get_with_slug(*key)
-          if respond_to?(:slug_options) && slug_options && key[0].to_s.to_i.to_s != key[0].to_s
-            first(:slug => key[0])
-          else
+          result = nil
+          if respond_to?(:slug_options) && slug_options
+            result = first(:slug => key[0])
+          end
+
+          if result.nil?
             get_without_slug(*key)
+          else
+            result
           end
         end
 
