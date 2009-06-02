@@ -3,7 +3,7 @@ require Pathname(__FILE__).dirname.expand_path.parent + 'spec_helper'
 
 if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
   describe 'DataMapper::Is::Slug' do
- 
+
     class User
       include DataMapper::Resource
 
@@ -11,14 +11,14 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       property :email, String
       has n, :posts
       has n, :todos
- 
+
       def slug_for_email
         email.split("@").first
       end
- 
+
       is :slug, :source => :slug_for_email, :size => 80, :permanent_slug => false
     end
- 
+
     class Post
       include DataMapper::Resource
 
@@ -30,12 +30,12 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
 
       is :slug, :source => :title
     end
- 
+
     class Todo
       include DataMapper::Resource
       property :id, Serial
       property :title, String
- 
+
       belongs_to :user
     end
 
@@ -82,27 +82,27 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @post1 = Post.create :title => 'a' * Post.slug_options[:size]
       @post2 = Post.create :title => 'a' * Post.slug_options[:size]
     end
- 
+
     it "should generate slugs" do
       User.all.each do |u|
         u.slug.should_not be_nil
       end
- 
+
       Post.all.each do |p|
         p.slug.should_not be_nil
       end
     end
- 
+
     it "should generate unique slugs" do
       @u1.slug.should_not == @u2.slug
       @p1.slug.should_not == @p4.slug
     end
- 
+
     it "should generate correct slug for user" do
       @u1.slug.should == "john"
       @u2.slug.should == "john-2"
     end
- 
+
     it "should generate correct slug for post" do
       @p1.slug.should == "my-first-shinny-blog-post"
       @p2.slug.should == "my-second-shinny-blog-post"
@@ -125,13 +125,13 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
         instance_variable_get("@p_#{i}".to_sym).slug.should == "dm-tricks-#{i}"
       end
     end
- 
+
     it "should update slug if :permanent_slug => :false is specified" do
       user = User.create(:email => "a_person@ekohe.com")
       user.slug.should == "a_person"
- 
+
       user.should_not be_permanent_slug
- 
+
       user.email = "changed@ekohe.com"
       user.should be_dirty
 
@@ -139,7 +139,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       user.slug.should == "changed"
       user.destroy
     end
- 
+
     it "should not update slug if :permanent_slug => :true or not specified" do
       post = Post.create(:user => @u1, :title => "hello world!")
       post.slug.should ==  "hello-world"
@@ -150,7 +150,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       post.slug.should == "hello-world"
       post.destroy
     end
- 
+
     it "should have the right size for properties" do
       user_slug_property = User.properties.detect{|p| p.name == :slug && p.type == String}
       user_slug_property.should_not be_nil
@@ -161,27 +161,27 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       post_slug_property.should_not be_nil
       post_slug_property.size.should == 30
     end
- 
+
     it "should find model using get method with slug" do
       u = User.get("john")
       u.should_not be_nil
       u.should == @u1
- 
+
       Post.get("my-first-shinny-blog-post").should == @p1
       @u1.posts.get("my-first-shinny-blog-post").should == @p1
     end
- 
+
     it "should output slug with to_param method" do
       @u1.to_param.should == ["john"]
       @p1.to_param.should == ["my-first-shinny-blog-post"]
     end
- 
+
     it "should find model using get method using id" do
-      u = User.get(@u1.id)      
+      u = User.get(@u1.id)
       u.should_not be_nil
       u.should == @u1
     end
- 
+
     it "should find model using get method using id with non-slug models" do
       todo = Todo.create(:user => @u1, :title => "blabla")
       todo.should_not be_nil
@@ -193,7 +193,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     it 'should strip unicode characters from the slug' do
       @p17.slug.should == 'a-fancy-caf'
     end
-    
+
     it 'should have slug_property on instance' do
       @p1.slug_property.should == @p1.class.properties.detect{|p| p.name == :slug}
     end
