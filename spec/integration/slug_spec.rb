@@ -23,7 +23,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       include DataMapper::Resource
 
       property :id, Serial
-      property :title, String, :size => 2000
+      property :title, String, :size => 30
       property :content, Text
 
       belongs_to :user
@@ -152,11 +152,11 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       user_slug_property = User.properties.detect{|p| p.name == :slug && p.type == String}
       user_slug_property.should_not be_nil
       user_slug_property.size.should == 80
- 
-      Post.properties.detect{|p| p.name == :title && p.type == String}.size.should == 2000
+
+      Post.properties.detect{|p| p.name == :title && p.type == String}.size.should == 30
       post_slug_property = Post.properties.detect{|p| p.name == :slug && p.type == String}
       post_slug_property.should_not be_nil
-      post_slug_property.size.should == 2000
+      post_slug_property.size.should == 30
     end
  
     it "should find model using get method with slug" do
@@ -201,6 +201,18 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
 
     it 'should work with key on slug and validations' do
       @sk.slug.should == 'slug-key'
+    end
+
+    it 'should have slug no longer than slug_options[:size]' do
+      @post1.slug.length.should == @post1.class.slug_options[:size]
+    end
+
+    it 'should have suffixed slug no longer than slug_options[:size]' do
+      @post2.slug.length.should == @post2.class.slug_options[:size]
+    end
+
+    it 'should generate right slug for long sources' do
+      @post2.slug.should == ('a' * (@post2.class.slug_options[:size] - 2) + '-2')
     end
   end
 end

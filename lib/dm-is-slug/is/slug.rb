@@ -132,22 +132,25 @@ module DataMapper
 
         private
 
-        def make_unique_slug!
-          base_slug = DataMapper::Is::Slug.escape(slug_source_value)
-          i = 1
-          unique_slug = base_slug
-
-          while (self.class.first(:slug => unique_slug))
-            i = i + 1
-            unique_slug = "#{base_slug}-#{i}"
-          end
-          unique_slug
-        end
-
         def generate_slug
+          return unless self.class.respond_to?(:slug_options) && self.class.slug_options
           raise InvalidSlugSource('Invalid slug source.') unless slug_source_property || self.respond_to?(slug_source)
           return unless stale_slug?
-          self.slug = make_unique_slug!
+          attribute_set :slug, unique_slug
+        end
+
+        def unique_slug
+          max_length = self.class.send(:get_slug_size)
+          base_slug = ::DataMapper::Is::Slug.escape(slug_source_value)[0, max_length]
+          i = 1
+          new_slug = base_slug
+
+          while (self.class.first(:slug => new_slug))
+            i = i + 1
+            slug_length = max_length - i.to_s.length - 1
+            new_slug = "#{base_slug[0, slug_length]}-#{i}"
+          end
+          new_slug
         end
       end # InstanceMethods
 
