@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.email = ['aaron [a] ekohe [d] com', 'james.herdman@gmail.com', 'nik [a] terminaldischarge [d] net', 'maverick.stoklosa@gmail.com', 'frawl021@gmail.com', 'cheba@pointlessone.org']
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt"]
   s.files = [
+    "AUTHORS",
     "History.txt",
     "LICENSE",
     "Manifest.txt",
