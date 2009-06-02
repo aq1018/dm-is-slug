@@ -140,17 +140,26 @@ module DataMapper
         end
 
         def unique_slug
+          old_slug = self.slug
           max_length = self.class.send(:get_slug_size)
           base_slug = ::DataMapper::Is::Slug.escape(slug_source_value)[0, max_length]
           i = 1
           new_slug = base_slug
 
-          while (self.class.first(:slug => new_slug))
-            i = i + 1
-            slug_length = max_length - i.to_s.length - 1
-            new_slug = "#{base_slug[0, slug_length]}-#{i}"
+          if old_slug != new_slug
+            lambda do
+              dupe = self.class.first(:slug => new_slug)
+              if dupe && dupe != self
+                i = i + 1
+                slug_length = max_length - i.to_s.length - 1
+                new_slug = "#{base_slug[0, slug_length]}-#{i}"
+                redo
+              end
+            end.call
+            new_slug
+          else
+            old_slug
           end
-          new_slug
         end
       end # InstanceMethods
 

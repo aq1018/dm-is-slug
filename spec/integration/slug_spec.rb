@@ -217,5 +217,33 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     it 'should generate right slug for long sources' do
       @post2.slug.should == ('a' * (@post2.class.slug_options[:size] - 2) + '-2')
     end
+
+    describe 'editing' do
+      class Post2
+        include DataMapper::Resource
+        property :id, Serial
+        property :title, String, :size => 30
+        property :content, Text
+
+        is :slug, :source => :title, :permanent_slug => false
+      end
+
+      Post2.auto_migrate!
+
+      before :each do
+        Post2.all.destroy!
+        @post = Post2.create :title => 'The Post', :content => 'The content.'
+      end
+
+      it 'should not change slug if source is not changed' do
+        @post.update_attributes :content => 'The other content.'
+        Post2.first.slug.should == 'the-post'
+      end
+
+      it 'should change slug if source is changed' do
+        @post.update_attributes :title => 'The Other Post'
+        Post2.first.slug.should == 'the-other-post'
+      end
+    end
   end
 end
