@@ -59,7 +59,11 @@ module DataMapper
 
         slug_options[:size] ||= get_slug_size
         property(:slug, String, :size => slug_options[:size], :unique => true) unless slug_property
-        before :save, :generate_slug
+        if method_defined?(:valid?)
+          before :valid?, :generate_slug
+        else
+          before :slug, :generate_slug
+        end
       end
 
       module ClassMethods

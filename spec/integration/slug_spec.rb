@@ -39,10 +39,19 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       belongs_to :user
     end
 
+    class SlugKey
+      include DataMapper::Resource
+      property :title, String
+      property :slug, String, :key => true
+
+      is :slug, :source => :title
+    end
+
     before :all do
       User.auto_migrate!(:default)
       Post.auto_migrate!(:default)
       Todo.auto_migrate!(:default)
+      SlugKey.auto_migrate!(:default)
 
       @u1 = User.create(:email => "john@ekohe.com")
       @p1 = Post.create(:user => @u1, :title => "My first shinny blog post")
@@ -67,6 +76,8 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       (1..20).each do |i|
         instance_variable_set "@p_#{i}".to_sym, Post.create(:user => @u2, :title => "DM tricks")
       end
+
+      @sk = SlugKey.create(:title => 'slug key')
     end
  
     it "should generate slugs" do
@@ -186,6 +197,10 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
 
     it 'should properly increment slug suffix' do
       @p_20.slug.should == 'dm-tricks-20'
+    end
+
+    it 'should work with key on slug and validations' do
+      @sk.slug.should == 'slug-key'
     end
   end
 end
