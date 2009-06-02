@@ -78,6 +78,9 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       end
 
       @sk = SlugKey.create(:title => 'slug key')
+
+      @post1 = Post.create :title => 'a' * Post.slug_options[:size]
+      @post2 = Post.create :title => 'a' * Post.slug_options[:size]
     end
  
     it "should generate slugs" do
