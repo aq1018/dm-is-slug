@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name = "dm-is-slug"
-  s.version = "0.9.13"
+  s.version = "0.10.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ['Aaron Qian', 'James Herdman', 'Nik Radford', 'Paul', 'Mike Frawley', 'Alex Makuta']
-  s.date = "2009-06-02"
+  s.date = "2009-06-09"
   s.description = "DataMapper plugin that generates unique permalinks / slugs"
   s.email = ['aaron [a] ekohe [d] com', 'james.herdman@gmail.com', 'nik [a] terminaldischarge [d] net', 'maverick.stoklosa@gmail.com', 'frawl021@gmail.com', 'cheba@pointlessone.org']
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt"]
@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
     "spec/spec_helper.rb"
   ]
 
-  s.homepage = "http://github.com/aq1018/dm-is-slug"
+  s.homepage = "http://github.com/cheba/dm-is-slug"
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
   s.rubyforge_project = "dm-is-slug"
@@ -36,14 +36,14 @@ Gem::Specification.new do |s|
     s.specification_version = 2
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<dm-core>, ["~> 0.9"])
+      s.add_runtime_dependency(%q<dm-core>, ["~> 0.10"])
       s.add_development_dependency(%q<hoe>, [">= 1.8.2"])
     else
-      s.add_dependency(%q<dm-core>, ["~> 0.9"])
+      s.add_dependency(%q<dm-core>, ["~> 0.10"])
       s.add_dependency(%q<hoe>, [">= 1.8.2"])
     end
   else
-    s.add_dependency(%q<dm-core>, ["~> 0.9"])
+    s.add_dependency(%q<dm-core>, ["~> 0.10"])
     s.add_dependency(%q<hoe>, [">= 1.8.2"])
   end
 end
