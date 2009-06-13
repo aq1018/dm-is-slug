@@ -1,14 +1,9 @@
+require 'dm-core/support/chainable'
+
 module DataMapper
   module Is
     module Slug
-      class InvalidSlugSource < Exception
-      end
-
-      DEFAULT_SLUG_SIZE = 50
-
-      DEFAULT_SLUG_OPTIONS = {
-        :permanent_slug => true
-      }
+      class InvalidSlugSourceError < StandardError; end
 
       # @param [String] str A string to escape for use as a slug
       # @return [String] an URL-safe string
@@ -28,7 +23,7 @@ module DataMapper
       # in the specific resources when you fire is :slug
       ##
 
-      # Defines a +slug+ property on your model with the same size as your
+      # Defines a +slug+ property on your model with the same length as your
       # source property. This property is Unicode escaped, and treated so as
       # to be fit for use in URLs.
       #
@@ -46,24 +41,47 @@ module DataMapper
       #   The property on the model to use as the source of the generated slug,
       #   or an instance method defined in the model, the method must return
       #   a string or nil.
-      # +size+::
+      # +length+::
       #   The length of the +slug+ property
       #
       # @param [Hash] provide options in a Hash. See *Parameters* for details
       def is_slug(options)
+        if options.key?(:size)
+          warn "Slug with :size option is deprecated, use :length instead"
+          options[:length] = options.delete(:size)
+        end
+
         extend  DataMapper::Is::Slug::ClassMethods
         include DataMapper::Is::Slug::InstanceMethods
+        extend Chainable
 
-        @slug_options = DEFAULT_SLUG_OPTIONS.merge(options)
-        raise InvalidSlugSource('You must specify a :source to generate slug.') unless slug_source
+        @slug_options = {}
 
-        slug_options[:size] ||= get_slug_size
-        property(:slug, String, :size => slug_options[:size], :unique => true) unless slug_property
-        if method_defined?(:valid?)
-          before :valid?, :generate_slug
-        else
-          before :slug, :generate_slug
-        end
+        @slug_options[:permanent_slug] = options.delete(:permanent_slug)
+        @slug_options[:permanent_slug] = true if @slug_options[:permanent_slug].nil?
+
+        @slug_options[:source] = options.delete(:source)
+        raise InvalidSlugSourceError, 'You must specify a :source to generate slug.' unless slug_source
+
+
+        options[:length] ||= get_slug_length
+        property(:slug, String, options.merge(:unique => true)) unless slug_property
+
+        #if respond_to? :valid?
+        #  before :valid?, :generate_slug
+        #else
+        #  before :save, :generate_slug
+        #end
+        before :save, :generate_slug
+        #before :update, :generate_slug
+        before :valid?, :generate_slug
+
+        #chainable do
+        #  def save(*args)
+        #    generate_slug
+        #    super(*args)
+        #  end
+        #end
       end
 
       module ClassMethods
@@ -88,13 +106,12 @@ module DataMapper
         private
 
         def detect_slug_property_by_name(name)
-          properties.detect do |p|
-            p.name == name && p.type == String
-          end
+          p = properties[name]
+          !p.nil? && p.type == String ? p : nil
         end
 
-        def get_slug_size
-          slug_source_property && slug_source_property.size || DataMapper::Is::Slug::DEFAULT_SLUG_SIZE
+        def get_slug_length
+          slug_property.nil? ? (slug_source_property.nil? ? DataMapper::Property::DEFAULT_LENGTH : slug_source_property.length) : slug_property.length
         end
       end # ClassMethods
 
@@ -133,29 +150,42 @@ module DataMapper
         private
 
         def generate_slug
+          #puts "\nGenerating slug for #{self.class.name}: #{self.key.inspect}\n"
           return unless self.class.respond_to?(:slug_options) && self.class.slug_options
-          raise InvalidSlugSource('Invalid slug source.') unless slug_source_property || self.respond_to?(slug_source)
+          raise InvalidSlugSourceError, 'Invalid slug source.' unless slug_source_property || self.respond_to?(slug_source)
           return unless stale_slug?
           attribute_set :slug, unique_slug
         end
 
         def unique_slug
           old_slug = self.slug
-          max_length = self.class.send(:get_slug_size)
+          max_length = self.class.send(:get_slug_length)
           base_slug = ::DataMapper::Is::Slug.escape(slug_source_value)[0, max_length]
           i = 1
           new_slug = base_slug
 
           if old_slug != new_slug
+            not_self_conditions = {}
+            unless new?
+              self.model.key.each do |property|
+                not_self_conditions.merge!(property.name.not => self.send(property.name))
+              end
+              #puts "Not self: #{not_self_conditions.inspect}"
+            end
+
             lambda do
-              dupe = self.class.first(:slug => new_slug)
-              if dupe && dupe != self
+              #puts "Lambda new slug: #{new_slug}"
+              dupe = self.class.first(not_self_conditions.merge(:slug => new_slug))
+              if dupe
+                #puts "Got dupe: #{dupe.inspect}"
                 i = i + 1
                 slug_length = max_length - i.to_s.length - 1
                 new_slug = "#{base_slug[0, slug_length]}-#{i}"
+                #puts "New slug: #{new_slug}"
                 redo
               end
             end.call
+            #puts "Found new slug: #{new_slug}"
             new_slug
           else
             old_slug

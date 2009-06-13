@@ -7,11 +7,4 @@ require Pathname(__FILE__).dirname.expand_path / 'dm-is-slug' / 'is' / 'version.
 # Require plugin-files
 require Pathname(__FILE__).dirname.expand_path / 'dm-is-slug' / 'is' / 'slug.rb'
 
-# Include the plugin in Resource
-module DataMapper
-  module Resource
-    module ClassMethods
-      include DataMapper::Is::Slug
-    end # module ClassMethods
-  end # module Resource
-end # module DataMapper
+DataMapper::Model.append_extensions DataMapper::Is::Slug
