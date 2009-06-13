@@ -16,14 +16,14 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
         email.split("@").first
       end
 
-      is :slug, :source => :slug_for_email, :size => 80, :permanent_slug => false
+      is :slug, :source => :slug_for_email, :length => 80, :permanent_slug => false
     end
 
     class Post
       include DataMapper::Resource
 
       property :id, Serial
-      property :title, String, :size => 30
+      property :title, String, :length => 30
       property :content, Text
 
       belongs_to :user
@@ -42,9 +42,8 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     class SlugKey
       include DataMapper::Resource
       property :title, String
-      property :slug, String, :key => true
 
-      is :slug, :source => :title
+      is :slug, :source => :title, :key => true
     end
 
     before :all do
@@ -61,26 +60,19 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @u2 = User.create(:email => "john@someotherplace.com")
       @p4 = Post.create(:user => @u2, :title => "My first Shinny blog post")
       @p5 = Post.create(:user => @u2, :title => "i heart merb and dm")
-      @p6 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p7 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p8 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p9 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p10 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p11 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p12 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p13 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p14 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p15 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p16 = Post.create(:user => @u2, :title => "another productive day!!")
-      @p17 = Post.create(:user => @u2, :title => "A fancy café")
-      (1..20).each do |i|
-        instance_variable_set "@p_#{i}".to_sym, Post.create(:user => @u2, :title => "DM tricks")
+      @p6 = Post.create(:user => @u2, :title => "A fancy café")
+
+      (1..10).each do |i|
+        instance_variable_set "@p1_#{i}".to_sym, Post.create(:user => @u2, :title => "another productive day!!")
+      end
+      (1..10).each do |i|
+        instance_variable_set "@p2_#{i}".to_sym, Post.create(:user => @u2, :title => "DM tricks")
       end
 
       @sk = SlugKey.create(:title => 'slug key')
 
-      @post1 = Post.create :title => 'a' * Post.slug_options[:size]
-      @post2 = Post.create :title => 'a' * Post.slug_options[:size]
+      @post1 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
+      @post2 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
     end
 
     it "should generate slugs" do
@@ -109,20 +101,15 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @p3.slug.should == "my-third-shinny-blog-post"
       @p4.slug.should == "my-first-shinny-blog-post-2"
       @p5.slug.should == "i-heart-merb-and-dm"
-      @p6.slug.should == "another-productive-day"
-      @p7.slug.should == "another-productive-day-2"
-      @p8.slug.should == "another-productive-day-3"
-      @p9.slug.should == "another-productive-day-4"
-      @p10.slug.should == "another-productive-day-5"
-      @p11.slug.should == "another-productive-day-6"
-      @p12.slug.should == "another-productive-day-7"
-      @p13.slug.should == "another-productive-day-8"
-      @p14.slug.should == "another-productive-day-9"
-      @p15.slug.should == "another-productive-day-10"
-      @p16.slug.should == "another-productive-day-11"
-      @p_1.slug.should == 'dm-tricks'
-      (2..20).each do |i|
-        instance_variable_get("@p_#{i}".to_sym).slug.should == "dm-tricks-#{i}"
+
+      @p1_1.slug.should == "another-productive-day"
+      (2..10).each do |i|
+        instance_variable_get("@p1_#{i}".to_sym).slug.should == "another-productive-day-#{i}"
+      end
+
+      @p2_1.slug.should == 'dm-tricks'
+      (2..10).each do |i|
+        instance_variable_get("@p2_#{i}".to_sym).slug.should == "dm-tricks-#{i}"
       end
     end
 
@@ -152,14 +139,19 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     end
 
     it "should have the right size for properties" do
-      user_slug_property = User.properties.detect{|p| p.name == :slug && p.type == String}
+      user_slug_property = User.properties[:slug]
       user_slug_property.should_not be_nil
-      user_slug_property.size.should == 80
+      user_slug_property.type.should == String
+      user_slug_property.length.should == 80
 
-      Post.properties.detect{|p| p.name == :title && p.type == String}.size.should == 30
-      post_slug_property = Post.properties.detect{|p| p.name == :slug && p.type == String}
+      post_title_property = Post.properties[:title]
+      post_title_property.type.should == String
+      post_title_property.length.should == 30
+
+      post_slug_property = Post.properties[:slug]
+      post_slug_property.type.should == String
       post_slug_property.should_not be_nil
-      post_slug_property.size.should == 30
+      post_slug_property.length.should == 30
     end
 
     it "should find model using get method with slug" do
@@ -191,7 +183,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     end
 
     it 'should strip unicode characters from the slug' do
-      @p17.slug.should == 'a-fancy-caf'
+      @p6.slug.should == 'a-fancy-caf'
     end
 
     it 'should have slug_property on instance' do
@@ -199,30 +191,32 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     end
 
     it 'should properly increment slug suffix' do
-      @p_20.slug.should == 'dm-tricks-20'
+      @p2_10.slug.should == 'dm-tricks-10'
     end
 
     it 'should work with key on slug and validations' do
+      @sk.title.should == 'slug key'
       @sk.slug.should == 'slug-key'
     end
 
-    it 'should have slug no longer than slug_options[:size]' do
-      @post1.slug.length.should == @post1.class.slug_options[:size]
+    it 'should have slug no longer than slug_property.length' do
+      @post1.slug.length.should == @post1.slug_property.length
     end
 
-    it 'should have suffixed slug no longer than slug_options[:size]' do
-      @post2.slug.length.should == @post2.class.slug_options[:size]
+    it 'should have suffixed slug no longer than slug_property.length' do
+      @post2.slug.length.should == @post2.class.slug_property.length
     end
 
     it 'should generate right slug for long sources' do
-      @post2.slug.should == ('a' * (@post2.class.slug_options[:size] - 2) + '-2')
+      @post1.slug.should == 'a' * @post1.class.slug_property.length
+      @post2.slug.should == ('a' * (@post2.class.slug_property.length - 2) + '-2')
     end
 
     describe 'editing' do
       class Post2
         include DataMapper::Resource
         property :id, Serial
-        property :title, String, :size => 30
+        property :title, String, :length => 30
         property :content, Text
 
         is :slug, :source => :title, :permanent_slug => false
@@ -236,13 +230,14 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       end
 
       it 'should not change slug if source is not changed' do
-        @post.update_attributes :content => 'The other content.'
+        @post.update :content => 'The other content.'
         Post2.first.slug.should == 'the-post'
       end
 
       it 'should change slug if source is changed' do
-        @post.update_attributes :title => 'The Other Post'
-        Post2.first.slug.should == 'the-other-post'
+        @post.update :title => 'The Other Post'
+        post = Post2.first
+        post.slug.should == 'the-other-post'
       end
     end
   end
