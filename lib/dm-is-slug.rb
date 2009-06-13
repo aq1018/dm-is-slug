@@ -15,17 +15,3 @@ module DataMapper
     end # module ClassMethods
   end # module Resource
 end # module DataMapper
-
-# Include DataMapper::Model#get and DataMapper::Collection#get override
-# So we do user.posts.get("my-shinny-new-post")
-
-module DataMapper
-  module Model
-    include DataMapper::Is::Slug::AliasMethods
-  end
-
-  class Collection
-    include DataMapper::Is::Slug::AliasMethods
-  end
-end
-
