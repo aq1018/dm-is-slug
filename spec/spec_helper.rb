@@ -2,6 +2,10 @@ require 'rubygems'
 gem 'rspec', '~>1.2.6'
 require 'spec'
 require 'pathname'
+
+gem 'dm-core', '~>0.10.0'
+require 'dm-core'
+
 require Pathname(__FILE__).dirname.expand_path.parent + 'lib/dm-is-slug'
 
 def load_driver(name, default_uri)
@@ -10,7 +14,7 @@ def load_driver(name, default_uri)
   lib = "do_#{name}"
 
   begin
-    gem lib, '~>0.9.7'
+    gem lib, '~>0.10.0'
     require lib
     DataMapper.setup(name, ENV["#{name.to_s.upcase}_SPEC_URI"] || default_uri)
     DataMapper::Repository.adapters[:default] =  DataMapper::Repository.adapters[name]
@@ -27,6 +31,6 @@ HAS_SQLITE3  = load_driver(:sqlite3,  'sqlite3::memory:')
 HAS_MYSQL    = load_driver(:mysql,    'mysql://localhost/dm_core_test')
 HAS_POSTGRES = load_driver(:postgres, 'postgres://postgres@localhost/dm_core_test')
 
-gem 'dm-validations'
+gem 'dm-validations', '~> 0.10.0'
 require 'dm-validations'
 
