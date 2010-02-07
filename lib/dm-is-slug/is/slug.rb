@@ -1,3 +1,4 @@
+require 'unidecode'
 require 'dm-core/support/chainable'
 
 module DataMapper
@@ -8,7 +9,7 @@ module DataMapper
       # @param [String] str A string to escape for use as a slug
       # @return [String] an URL-safe string
       def self.escape(str)
-        s = Iconv.conv('ascii//translit//IGNORE', 'utf-8', str)
+        s = str.to_ascii
         s.gsub!(/\W+/, ' ')
         s.strip!
         s.downcase!
@@ -67,21 +68,8 @@ module DataMapper
         options[:length] ||= get_slug_length
         property(:slug, String, options.merge(:unique => true)) unless slug_property
 
-        #if respond_to? :valid?
-        #  before :valid?, :generate_slug
-        #else
-        #  before :save, :generate_slug
-        #end
-        before :save, :generate_slug
-        #before :update, :generate_slug
         before :valid?, :generate_slug
-
-        #chainable do
-        #  def save(*args)
-        #    generate_slug
-        #    super(*args)
-        #  end
-        #end
+        before :save, :generate_slug
       end
 
       module ClassMethods

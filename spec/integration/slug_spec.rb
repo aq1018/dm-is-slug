@@ -61,6 +61,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @p4 = Post.create(:user => @u2, :title => "My first Shinny blog post")
       @p5 = Post.create(:user => @u2, :title => "i heart merb and dm")
       @p6 = Post.create(:user => @u2, :title => "A fancy café")
+      @p7 = Post.create(:user => @u2, :title => "你好")
 
       (1..10).each do |i|
         instance_variable_set "@p1_#{i}".to_sym, Post.create(:user => @u2, :title => "another productive day!!")
@@ -173,10 +174,14 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @u1.todos.get(todo.id).should == todo
     end
 
-    it 'should strip unicode characters from the slug' do
-      @p6.slug.should == 'a-fancy-caf'
+    it 'should unidecode latin characters from the slug' do
+      @p6.slug.should == 'a-fancy-cafe'
     end
-
+    
+    it 'should unidecode chinese characters from the slug' do
+      @p7.slug.should == 'ni-hao'
+    end
+    
     it 'should have slug_property on instance' do
       @p1.slug_property.should == @p1.class.properties.detect{|p| p.name == :slug}
     end
