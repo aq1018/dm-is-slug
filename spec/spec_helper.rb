@@ -1,36 +1,38 @@
 require 'rubygems'
-gem 'rspec', '~>1.2.6'
-require 'spec'
-require 'pathname'
-
-gem 'dm-core', '~>0.10.0'
+ 
+# use local dm-core if running from a typical dev checkout.
+lib = File.join('..', '..', 'dm-core', 'lib')
+$LOAD_PATH.unshift(lib) if File.directory?(lib)
 require 'dm-core'
-
-require Pathname(__FILE__).dirname.expand_path.parent + 'lib/dm-is-slug'
-
+ 
+# use local dm-adjust if running from a typical dev checkout.
+lib = File.join('..', 'dm-adjust', 'lib')
+$LOAD_PATH.unshift(lib) if File.directory?(lib)
+require 'dm-adjust'
+ 
+# Support running specs with 'rake spec' and 'spec'
+$LOAD_PATH.unshift('lib') unless $LOAD_PATH.include?('lib')
+ 
+require 'dm-validations'
+require 'dm-is-slug'
+ 
 def load_driver(name, default_uri)
   return false if ENV['ADAPTER'] != name.to_s
-
-  lib = "do_#{name}"
-
+ 
   begin
-    gem lib, '~>0.10.0'
-    require lib
     DataMapper.setup(name, ENV["#{name.to_s.upcase}_SPEC_URI"] || default_uri)
-    DataMapper::Repository.adapters[:default] =  DataMapper::Repository.adapters[name]
+    DataMapper::Repository.adapters[:default] = DataMapper::Repository.adapters[name]
     true
-  rescue Gem::LoadError => e
-    warn "Could not load #{lib}: #{e}"
+  rescue LoadError => e
+    warn "Could not load do_#{name}: #{e}"
     false
   end
 end
-
+ 
 ENV['ADAPTER'] ||= 'sqlite3'
-
-HAS_SQLITE3  = load_driver(:sqlite3,  'sqlite3::memory:')
-HAS_MYSQL    = load_driver(:mysql,    'mysql://localhost/dm_core_test')
+ 
+HAS_SQLITE3 = load_driver(:sqlite3, 'sqlite3::memory:')
+HAS_MYSQL = load_driver(:mysql, 'mysql://localhost/dm_core_test')
 HAS_POSTGRES = load_driver(:postgres, 'postgres://postgres@localhost/dm_core_test')
 
-gem 'dm-validations', '~> 0.10.0'
-require 'dm-validations'
 

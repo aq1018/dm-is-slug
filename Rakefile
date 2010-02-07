@@ -1,54 +1,32 @@
-# -*- ruby -*-
-
 require 'rubygems'
-require 'hoe'
-require 'spec/rake/spectask'
-require 'pathname'
+require 'rake'
 
-ROOT = Pathname(__FILE__).dirname.expand_path
-require ROOT + 'lib/dm-is-slug/is/version'
-
-AUTHOR = ['Aaron Qian', 'James Herdman', 'Nik Radford', 'Paul', 'Mike Frawley', 'Alex Makuta']
-EMAIL  = ['aaron [a] ekohe [d] com', 'james.herdman@gmail.com', 'nik [a] terminaldischarge [d] net', 'maverick.stoklosa@gmail.com', 'frawl021@gmail.com', 'cheba@pointlessone.org']
-GEM_NAME = "dm-is-slug"
-GEM_VERSION = DataMapper::Is::Slug::VERSION
-GEM_DEPENDENCIES = [["dm-core", "~>0.9"]]
-GEM_CLEAN = ["log", "pkg"]
-GEM_EXTRAS = { :has_rdoc => false }
+begin
+  gem 'jeweler', '~> 1.4'
+  require 'jeweler'
  
-PROJECT_NAME = "dm-is-slug"
-PROJECT_URL  = "http://github.com/aq1018/dm-is-slug"
-PROJECT_DESCRIPTION = PROJECT_SUMMARY = "DataMapper plugin that generates unique slugs"
-
-require 'tasks/hoe'
-
-task :default => [ :spec ]
- 
-WIN32 = (RUBY_PLATFORM =~ /win32|mingw|cygwin/) rescue nil
-SUDO  = WIN32 ? '' : ('sudo' unless ENV['SUDOLESS'])
- 
-desc "Install #{GEM_NAME} #{GEM_VERSION}"
-task :install => [ :package ] do
-  sh "#{SUDO} gem install --local pkg/#{GEM_NAME}-#{GEM_VERSION} --no-update-sources", :verbose => false
-end
- 
-desc "Uninstall #{GEM_NAME} #{GEM_VERSION} (default ruby)"
-task :uninstall => [ :clobber ] do
-  sh "#{SUDO} gem uninstall #{GEM_NAME} -v#{GEM_VERSION} -I -x", :verbose => false
-end
- 
-desc 'Run specifications'
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_opts << '--options' << 'spec/spec.opts' if File.exists?('spec/spec.opts')
-  t.spec_files = Pathname.glob(Pathname.new(__FILE__).dirname + 'spec/**/*_spec.rb')
- 
-  begin
-    t.rcov = ENV.has_key?('NO_RCOV') ? ENV['NO_RCOV'] != 'true' : true
-    t.rcov_opts << '--exclude' << 'spec'
-    t.rcov_opts << '--text-summary'
-    t.rcov_opts << '--sort' << 'coverage' << '--sort-reverse'
-  rescue Exception
-    puts 'rcov is not installed. Please install before continuing'
-    exit
+  Jeweler::Tasks.new do |gem|
+    gem.name = "dm-is-slug"
+    gem.summary = "DataMapper plugin that generates unique slugs"
+    gem.description = gem.summary
+    gem.email = [
+      'aq1018@gmail.com',
+      'james.herdman@gmail.com',
+      'nik [a] terminaldischarge [d] net',
+      'maverick.stoklosa@gmail.com',
+      'frawl021@gmail.com',
+      'cheba@pointlessone.org'
+    ]
+    gem.homepage = "http://github.com/aq1018/dm-is-slug"
+    gem.authors = ['Aaron Qian', 'James Herdman', 'Nik Radford', 'Paul', 'Mike Frawley', 'Alex Makuta']
+    gem.add_dependency "dm-core", "~>0.10.2"
+    gem.add_dependency "unidecode", "~>1.0.0"
+    gem.add_development_dependency 'rspec', '~> 1.3'
   end
+ 
+  Jeweler::GemcutterTasks.new
+ 
+  FileList['tasks/**/*.rake'].each { |task| import task }
+rescue LoadError
+  puts 'Jeweler (or a dependency) not available. Install it with: gem install jeweler'
 end
