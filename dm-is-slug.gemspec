@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dm-is-slug}
-  s.version = "0.10.3"
+  s.version = "0.10.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Qian", "James Herdman", "Nik Radford", "Paul", "Mike Frawley", "Alex Makuta"]
@@ -20,15 +20,22 @@ Gem::Specification.new do |s|
   s.files = [
     ".gitignore",
      "LICENSE",
+     "README.textile",
      "Rakefile",
      "TODO",
+     "VERSION",
      "dm-is-slug.gemspec",
      "lib/dm-is-slug.rb",
      "lib/dm-is-slug/is/slug.rb",
-     "lib/dm-is-slug/is/version.rb",
      "spec/integration/slug_spec.rb",
+     "spec/rcov.opts",
      "spec/spec.opts",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "tasks/ci.rake",
+     "tasks/metrics.rake",
+     "tasks/spec.rake",
+     "tasks/yard.rake",
+     "tasks/yardstick.rake"
   ]
   s.homepage = %q{http://github.com/aq1018/dm-is-slug}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -45,14 +52,17 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<dm-core>, ["~> 0.10.3"])
+      s.add_runtime_dependency(%q<dm-core>, ["~> 0.10.2"])
+      s.add_runtime_dependency(%q<unidecode>, ["~> 1.0.0"])
       s.add_development_dependency(%q<rspec>, ["~> 1.3"])
     else
-      s.add_dependency(%q<dm-core>, ["~> 0.10.3"])
+      s.add_dependency(%q<dm-core>, ["~> 0.10.2"])
+      s.add_dependency(%q<unidecode>, ["~> 1.0.0"])
       s.add_dependency(%q<rspec>, ["~> 1.3"])
     end
   else
-    s.add_dependency(%q<dm-core>, ["~> 0.10.3"])
+    s.add_dependency(%q<dm-core>, ["~> 0.10.2"])
+    s.add_dependency(%q<unidecode>, ["~> 1.0.0"])
     s.add_dependency(%q<rspec>, ["~> 1.3"])
   end
 end

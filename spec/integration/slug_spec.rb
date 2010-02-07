@@ -75,6 +75,35 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       @post1 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
       @post2 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
     end
+    
+    it "should raise error if :source option is not specified" do
+      lambda {
+        class BadUsage
+          include DataMapper::Resource
+
+          property :id, Serial
+
+          is :slug, {}
+        end        
+      }.should raise_error(DataMapper::Is::Slug::InvalidSlugSourceError)
+    end
+    
+    it "should display obsolete warning if :size option is used" do
+      class Thingy
+      end
+      Thingy.stub!(:warn)
+      Thingy.should_receive(:warn).with("Slug with :size option is deprecated, use :length instead")
+
+      lambda {
+        class Thingy
+          include DataMapper::Resource
+          property :title, String
+
+          is :slug, :source => :title, :size => 20
+        end
+      }.should_not raise_error
+
+    end
 
     it "should generate slugs" do
       User.all.each do |u|
