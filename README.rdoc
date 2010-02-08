@@ -25,22 +25,22 @@ DataMapper plugin for creating and slugs(permalinks).
 === Creating a slug from arbitrary methods
 
   class User
-  	include DataMapper::Resource
+    include DataMapper::Resource
 
-  	property :id, Serial
-  	property :email, String
-  	property :password, String
+    property :id, Serial
+    property :email, String
+    property :password, String
   
-  	# we only want to strip out the domain name 
-  	# and use only the email account name as the permalink
-  	def slug_for_email
+    # we only want to strip out the domain name 
+    # and use only the email account name as the permalink
+    def slug_for_email
       email.split("@").first
-  	end
+    end
   
-  	# here we define that it should have a slug that uses title as the permalink
-  	# it will generate an extra slug property of String type, with the same size as title
-  	is :slug, :source => :slug_for_email, :size => 255
-	end
+    # here we define that it should have a slug that uses title as the permalink
+    # it will generate an extra slug property of String type, with the same size as title
+    is :slug, :source => :slug_for_email, :size => 255
+  end
 
 === Finding objects by slug
 
