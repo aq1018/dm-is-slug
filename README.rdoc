@@ -4,53 +4,44 @@ DataMapper plugin for creating and slugs(permalinks).
 
 == Installation
 
-NOTE: You no longer need to download dm-more source code in order to install
-this.
+  > gem install dm-is-slug
 
-All you need to do is:
+== Usage
 
-$ sudo rake install
+=== Creating a slug from property
 
-Remember to require it in your app's init.rb
+  class Post
+    include DataMapper::Resource
 
-dependency 'dm-is-slug'
+    property :id, Serial
+    property :title, String
+    property :content, String
 
-== Getting started
-
-Lets say we have a post-class, and we want to generate permalinks or slugs for all posts.
-
-class Post
-  include DataMapper::Resource
-
-  property :id, Serial
-  property :title, String
-  property :content, String
-
-  # here we define that it should have a slug that uses title as the permalink
-  # it will generate an extra slug property of String type, with the same size as title
-  is :slug, :source => :title
-end
-
-Let's Say we need to define a permalink based on a method instead of a property.
-
-class User
-  include DataMapper::Resource
-
-  property :id, Serial
-  property :email, String
-  property :password, String
-  
-  # we only want to strip out the domain name 
-  # and use only the email account name as the permalink
-  def slug_for_email
-    email.split("@").first
+    # here we define that it should have a slug that uses title as the permalink
+    # it will generate an extra slug property of String type, with the same size as title
+    is :slug, :source => :title
   end
-  
-  # here we define that it should have a slug that uses title as the permalink
-  # it will generate an extra slug property of String type, with the same size as title
-  is :slug, :source => :slug_for_email, :size => 255
-end
 
-You can now find objects by slug like this:
+=== Creating a slug from arbitrary methods
+
+  class User
+  	include DataMapper::Resource
+
+  	property :id, Serial
+  	property :email, String
+  	property :password, String
+  
+  	# we only want to strip out the domain name 
+  	# and use only the email account name as the permalink
+  	def slug_for_email
+      email.split("@").first
+  	end
+  
+  	# here we define that it should have a slug that uses title as the permalink
+  	# it will generate an extra slug property of String type, with the same size as title
+  	is :slug, :source => :slug_for_email, :size => 255
+	end
+
+=== Finding objects by slug
 
  post = Post.first(:slug => "your_slug")
