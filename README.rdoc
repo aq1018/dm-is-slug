@@ -45,3 +45,14 @@ DataMapper plugin for creating and slugs(permalinks).
 === Finding objects by slug
 
  post = Post.first(:slug => "your_slug")
+
+== Development
+
+It's recommended to use bundler in development.
+
+  gem install bundler
+  ADAPTERS='in_memory yaml sqlite postgres mysql' bundle install --without quality
+
+This will install all dependencies so that you could run specs.
+
+  bundler exec rake spec ADAPTER=in_memory

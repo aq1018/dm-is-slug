@@ -1,10 +1,12 @@
-require 'pathname'
-require Pathname(__FILE__).dirname.expand_path.parent + 'spec_helper'
+# encoding: utf-8
 
-if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
-  describe 'DataMapper::Is::Slug' do
+require 'spec_helper'
 
-    class User
+
+describe DataMapper::Is::Slug do
+
+  before :all do
+    class ::User
       include DataMapper::Resource
 
       property :id, Serial
@@ -19,7 +21,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       is :slug, :source => :slug_for_email, :length => 80, :permanent_slug => false
     end
 
-    class Post
+    class ::Post
       include DataMapper::Resource
 
       property :id, Serial
@@ -31,7 +33,7 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       is :slug, :source => :title
     end
 
-    class Todo
+    class ::Todo
       include DataMapper::Resource
       property :id, Serial
       property :title, String
@@ -39,43 +41,58 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
       belongs_to :user
     end
 
-    class SlugKey
+    class ::SlugKey
       include DataMapper::Resource
       property :title, String
 
       is :slug, :source => :title, :key => true
     end
 
-    before :all do
-      User.auto_migrate!(:default)
-      Post.auto_migrate!(:default)
-      Todo.auto_migrate!(:default)
-      SlugKey.auto_migrate!(:default)
+    class ::Post2
+      include DataMapper::Resource
 
-      @u1 = User.create(:email => "john@ekohe.com")
-      @p1 = Post.create(:user => @u1, :title => "My first shinny blog post")
-      @p2 = Post.create(:user => @u1, :title => "My second shinny blog post")
-      @p3 = Post.create(:user => @u1, :title => "My third shinny blog post")
+      property :id, Serial
+      property :title, String, :length => 30
+      property :content, Text
 
-      @u2 = User.create(:email => "john@someotherplace.com")
-      @p4 = Post.create(:user => @u2, :title => "My first Shinny blog post")
-      @p5 = Post.create(:user => @u2, :title => "i heart merb and dm")
-      @p6 = Post.create(:user => @u2, :title => "A fancy café")
-      @p7 = Post.create(:user => @u2, :title => "你好")
-
-      (1..10).each do |i|
-        instance_variable_set "@p1_#{i}".to_sym, Post.create(:user => @u2, :title => "another productive day!!")
-      end
-      (1..10).each do |i|
-        instance_variable_set "@p2_#{i}".to_sym, Post.create(:user => @u2, :title => "DM tricks")
-      end
-
-      @sk = SlugKey.create(:title => 'slug key')
-
-      @post1 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
-      @post2 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
+      is :slug, :source => :title, :permanent_slug => false
     end
-    
+
+    #DataMapper.finalize
+
+    #DataMapper.auto_migrate!
+
+  end
+
+  supported_by :all do
+
+    before :all do
+      DataMapper.repository do
+        @u1 = User.create(:email => "john@ekohe.com")
+        @p1 = Post.create(:user => @u1, :title => "My first shinny blog post")
+        @p2 = Post.create(:user => @u1, :title => "My second shinny blog post")
+        @p3 = Post.create(:user => @u1, :title => "My third shinny blog post")
+
+        @u2 = User.create(:email => "john@someotherplace.com")
+        @p4 = Post.create(:user => @u2, :title => "My first Shinny blog post")
+        @p5 = Post.create(:user => @u2, :title => "i heart merb and dm")
+        @p6 = Post.create(:user => @u2, :title => "A fancy café")
+        @p7 = Post.create(:user => @u2, :title => "你好")
+
+        (1..10).each do |i|
+          instance_variable_set "@p1_#{i}".to_sym, Post.create(:user => @u2, :title => "another productive day!!")
+        end
+        (1..10).each do |i|
+          instance_variable_set "@p2_#{i}".to_sym, Post.create(:user => @u2, :title => "DM tricks")
+        end
+
+        @sk = SlugKey.create(:title => 'slug key')
+
+        @post1 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
+        @post2 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
+      end
+    end
+
     it "should raise error if :source option is not specified" do
       lambda {
         class BadUsage
@@ -89,20 +106,24 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     end
     
     it "should display obsolete warning if :size option is used" do
-      class Thingy
+      module M
+        class Thingy
+        end
       end
-      Thingy.stub!(:warn)
-      Thingy.should_receive(:warn).with("Slug with :size option is deprecated, use :length instead")
+      M::Thingy.stub!(:warn)
+      M::Thingy.should_receive(:warn).with("Slug with :size option is deprecated, use :length instead")
 
       lambda {
-        class Thingy
+        class M::Thingy
           include DataMapper::Resource
+          property :id, Serial
           property :title, String
 
           is :slug, :source => :title, :size => 20
         end
       }.should_not raise_error
 
+      M.const_set 'Thingy', nil
     end
 
     it "should generate slugs" do
@@ -171,15 +192,15 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     it "should have the right size for properties" do
       user_slug_property = User.properties[:slug]
       user_slug_property.should_not be_nil
-      user_slug_property.type.should == String
+      user_slug_property.should be_an_instance_of(DataMapper::Property::String)
       user_slug_property.length.should == 80
 
       post_title_property = Post.properties[:title]
-      post_title_property.type.should == String
+      post_title_property.should be_an_instance_of(DataMapper::Property::String)
       post_title_property.length.should == 30
 
       post_slug_property = Post.properties[:slug]
-      post_slug_property.type.should == String
+      post_slug_property.should be_an_instance_of(DataMapper::Property::String)
       post_slug_property.should_not be_nil
       post_slug_property.length.should == 30
     end
@@ -238,17 +259,6 @@ if HAS_SQLITE3 || HAS_MYSQL || HAS_POSTGRES
     end
 
     describe 'editing' do
-      class Post2
-        include DataMapper::Resource
-        property :id, Serial
-        property :title, String, :length => 30
-        property :content, Text
-
-        is :slug, :source => :title, :permanent_slug => false
-      end
-
-      Post2.auto_migrate!
-
       before :each do
         Post2.all.destroy!
         @post = Post2.create :title => 'The Post', :content => 'The content.'

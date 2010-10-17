@@ -1,9 +1,14 @@
 require 'unidecode'
+require 'dm-core'
 require 'dm-core/support/chainable'
 
 module DataMapper
   module Is
     module Slug
+      def self.included(base)
+        base.extend ClassMethods
+      end
+
       class InvalidSlugSourceError < StandardError; end
 
       # @param [String] str A string to escape for use as a slug
@@ -68,7 +73,7 @@ module DataMapper
         options[:length] ||= get_slug_length
         property(:slug, String, options.merge(:unique => true)) unless slug_property
 
-        before :valid?, :generate_slug
+        before respond_to?(:valid?) ? :valid? : :save, :generate_slug
         before :save, :generate_slug
       end
 
@@ -95,11 +100,11 @@ module DataMapper
 
         def detect_slug_property_by_name(name)
           p = properties[name]
-          !p.nil? && p.type == String ? p : nil
+          !p.nil? && DataMapper::Property::String >= p.class ? p : nil
         end
 
         def get_slug_length
-          slug_property.nil? ? (slug_source_property.nil? ? DataMapper::Property::DEFAULT_LENGTH : slug_source_property.length) : slug_property.length
+          slug_property.nil? ? (slug_source_property.nil? ? DataMapper::Property::String::DEFAULT_LENGTH : slug_source_property.length) : slug_property.length
         end
       end # ClassMethods
 
@@ -173,13 +178,15 @@ module DataMapper
                 redo
               end
             end.call
-            #puts "Found new slug: #{new_slug}"
+            puts "Found new slug '#{new_slug}' in #{i} attempts"
             new_slug
           else
             old_slug
           end
         end
       end # InstanceMethods
+
+      Model.send(:include, self)
     end # Slug
   end # Is
 end # DataMapper

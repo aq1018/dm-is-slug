@@ -4,7 +4,7 @@ require 'rake'
 begin
   gem 'jeweler', '~> 1.4'
   require 'jeweler'
- 
+
   Jeweler::Tasks.new do |gem|
     gem.name = "dm-is-slug"
     gem.summary = "DataMapper plugin that generates unique slugs"
@@ -15,17 +15,19 @@ begin
       'nik [a] terminaldischarge [d] net',
       'maverick.stoklosa@gmail.com',
       'frawl021@gmail.com',
-      'cheba@pointlessone.org'
+      'cheba+github@pointlessone.org'
     ]
     gem.homepage = "http://github.com/aq1018/dm-is-slug"
-    gem.authors = ['Aaron Qian', 'James Herdman', 'Nik Radford', 'Paul', 'Mike Frawley', 'Alex Makuta']
-    gem.add_dependency "dm-core", "~>0.10.2"
-    gem.add_dependency "unidecode", "~>1.0.0"
+    gem.authors = ['Aaron Qian', 'James Herdman', 'Nik Radford', 'Paul', 'Mike Frawley', 'Alexander Mankuta']
+
+    gem.add_dependency "dm-core", "~> 1.0.2"
+    gem.add_dependency "unidecode", "~> 1.0.0"
+
     gem.add_development_dependency 'rspec', '~> 1.3'
   end
- 
+
   Jeweler::GemcutterTasks.new
- 
+
   FileList['tasks/**/*.rake'].each { |task| import task }
 rescue LoadError
   puts 'Jeweler (or a dependency) not available. Install it with: gem install jeweler'
