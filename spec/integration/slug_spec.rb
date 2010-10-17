@@ -57,14 +57,9 @@ describe DataMapper::Is::Slug do
 
       is :slug, :source => :title, :permanent_slug => false
     end
-
-    #DataMapper.finalize
-
-    #DataMapper.auto_migrate!
-
   end
 
-  supported_by :all do
+  supported_by :sqlite, :mysql, :postgres do
 
     before :all do
       DataMapper.repository do
@@ -265,8 +260,9 @@ describe DataMapper::Is::Slug do
       end
 
       it 'should not change slug if source is not changed' do
-        @post.update :content => 'The other content.'
-        Post2.first.slug.should == 'the-post'
+        @post.update(:content => 'The other content.').should be_true
+        @post.reload
+        @post.slug.should == 'the-post'
       end
 
       it 'should change slug if source is changed' do
