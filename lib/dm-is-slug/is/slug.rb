@@ -146,7 +146,6 @@ module DataMapper
         private
 
         def generate_slug
-          #puts "\nGenerating slug for #{self.class.name}: #{self.key.inspect}\n"
           return unless self.class.respond_to?(:slug_options) && self.class.slug_options
           raise InvalidSlugSourceError, 'Invalid slug source.' unless slug_source_property || self.respond_to?(slug_source)
           return unless stale_slug?
@@ -154,38 +153,48 @@ module DataMapper
         end
 
         def unique_slug
-          old_slug = self.slug
           max_length = self.class.send(:get_slug_length)
           base_slug = ::DataMapper::Is::Slug.escape(slug_source_value)[0, max_length]
-          i = 1
+          # Assuming that 5 digits is more than enought
+          index_length = 5
           new_slug = base_slug
 
-          if old_slug != new_slug
-            not_self_conditions = {}
-            unless new?
-              self.model.key.each do |property|
-                not_self_conditions.merge!(property.name.not => self.send(property.name))
-              end
-              #puts "Not self: #{not_self_conditions.inspect}"
-            end
+          variations = max_length - base_slug.length - 1
 
-            lambda do
-              #puts "Lambda new slug: #{new_slug}"
-              dupe = self.class.first(not_self_conditions.merge(:slug => new_slug))
-              if dupe
-                #puts "Got dupe: #{dupe.inspect}"
-                i = i + 1
-                slug_length = max_length - i.to_s.length - 1
-                new_slug = "#{base_slug[0, slug_length]}-#{i}"
-                #puts "New slug: #{new_slug}"
-                redo
-              end
-            end.call
-            puts "Found new slug '#{new_slug}' in #{i} attempts"
-            new_slug
+          slugs = if variations > index_length + 1
+            [base_slug]
           else
-            old_slug
+            ((variations - 1)..index_length).map do |n|
+              base_slug[0, max_length - n - 1]
+            end.uniq
           end
+
+          not_self_conditions = {}
+          unless new?
+            self.model.key.each do |property|
+              not_self_conditions.merge!(property.name.not => self.send(property.name))
+            end
+          end
+
+          max_index = slugs.map do |s|
+            self.class.all(not_self_conditions.merge :slug.like => "#{s}-%")
+          end.flatten.map do |r|
+            index = r.slug.gsub /^(#{slugs.join '|'})-/, ''
+            index =~ /\d+/ ? index.to_i : nil
+          end.compact.max
+
+          new_index = if max_index.nil?
+            self.class.first(not_self_conditions.merge :slug => base_slug).present? ? 2 : 1
+          else
+            max_index + 1
+          end
+
+          if new_index > 1
+            slug_length = max_length - new_index.to_s.length - 1
+            new_slug = "#{base_slug[0, slug_length]}-#{new_index}"
+          end
+
+          new_slug
         end
       end # InstanceMethods
 
