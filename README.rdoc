@@ -55,4 +55,4 @@ It's recommended to use bundler in development.
 
 This will install all dependencies so that you could run specs.
 
-  bundler exec rake spec ADAPTER=in_memory
+  bundle exec rake spec ADAPTER=sqlite
