@@ -3,3 +3,5 @@ pkg
 coverage
 tmp
 *.gem
+.yardoc
+doc
