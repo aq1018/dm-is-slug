@@ -41,6 +41,15 @@ describe DataMapper::Is::Slug do
       belongs_to :user
     end
 
+    class ::Task
+      include DataMapper::Resource
+      property :id, Serial
+      property :title, String
+      property :category, String
+
+      is :slug, :source => :title, :scope => :category
+    end
+
     class ::SlugKey
       include DataMapper::Resource
       property :title, String
@@ -63,6 +72,9 @@ describe DataMapper::Is::Slug do
 
     before :all do
       DataMapper.repository do
+        puts ">>> #{DataMapper.repository.adapter.inspect}"
+        DataMapper.logger.set_log STDOUT, :debug, ' ~ ', true
+        DataMapper.logger << 'boo!'
         @u1 = User.create(:email => "john@ekohe.com")
         @p1 = Post.create(:user => @u1, :title => "My first shinny blog post")
         @p2 = Post.create(:user => @u1, :title => "My second shinny blog post")
@@ -96,10 +108,10 @@ describe DataMapper::Is::Slug do
           property :id, Serial
 
           is :slug, {}
-        end        
+        end
       }.should raise_error(DataMapper::Is::Slug::InvalidSlugSourceError)
     end
-    
+
     it "should display obsolete warning if :size option is used" do
       module M
         class Thingy
@@ -222,11 +234,11 @@ describe DataMapper::Is::Slug do
     it 'should unidecode latin characters from the slug' do
       @p6.slug.should == 'a-fancy-cafe'
     end
-    
+
     it 'should unidecode chinese characters from the slug' do
       @p7.slug.should == 'ni-hao'
     end
-    
+
     it 'should have slug_property on instance' do
       @p1.slug_property.should == @p1.class.properties.detect{|p| p.name == :slug}
     end
@@ -269,6 +281,28 @@ describe DataMapper::Is::Slug do
         @post.update :title => 'The Other Post'
         post = Post2.first
         post.slug.should == 'the-other-post'
+      end
+    end
+
+    describe 'scoping' do
+      before :each do
+        Task.all.destroy!
+      end
+
+      it 'should allow duplicate slugs within different scopes' do
+        t1 = Task.create :category => 'programming', :title => 'fix'
+        t1.slug.should == 'fix'
+
+        t2 = Task.create :category => 'plumbing', :title => 'fix'
+        t2.slug.should == 'fix'
+      end
+
+      it 'should not allow dupliate slugs within same scope' do
+        t1 = Task.create :category => 'programming', :title => 'fix'
+        t1.slug.should == 'fix'
+
+        t2 = Task.create :category => 'programming', :title => 'fix'
+        t2.slug.should == 'fix-2'
       end
     end
   end

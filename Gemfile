@@ -82,6 +82,7 @@ group :runtime do # Runtime dependencies (as in the gemspec)
   end
 
   gem 'dm-core',         DM_VERSION, :git => "#{DATAMAPPER}/dm-core.git"
+  gem 'dm-validations',  DM_VERSION, :git => "#{DATAMAPPER}/dm-validations.git"
 
   gem 'unidecode',         '~> 1.0.0'
 

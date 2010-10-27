@@ -66,6 +66,12 @@ module DataMapper
         @slug_options[:permanent_slug] = options.delete(:permanent_slug)
         @slug_options[:permanent_slug] = true if @slug_options[:permanent_slug].nil?
 
+        if options.has_key? :scope
+          @slug_options[:scope] = [options.delete(:scope)].flatten
+        end
+
+        @slug_options[:unique] = options.delete(:unique) || false
+
         @slug_options[:source] = options.delete(:source)
         raise InvalidSlugSourceError, 'You must specify a :source to generate slug.' unless slug_source
 
@@ -74,7 +80,14 @@ module DataMapper
         if slug_property && slug_property.class >= DataMapper::Property::String
             options.merge! slug_property.options
         end
-        property :slug, String, options.merge(:unique => true)
+        property :slug, String, options
+
+        if @slug_options[:unique]
+          scope_options = @slug_options[:scope] && @slug_options[:scope].any? ?
+            {:scope => @slug_options[:scope]} : {}
+
+          validates_uniqueness_of :slug, scope_options
+        end
 
         before respond_to?(:valid?) ? :valid? : :save, :generate_slug
         before :save, :generate_slug
@@ -176,15 +189,22 @@ module DataMapper
             end
           end
 
+          scope_conditions = {}
+          if self.class.slug_options[:scope]
+            self.class.slug_options[:scope].each do |subject|
+              scope_conditions[subject] = self.__send__(subject)
+            end
+          end
+
           max_index = slugs.map do |s|
-            self.class.all(not_self_conditions.merge :slug.like => "#{s}-%")
+            self.class.all(not_self_conditions.merge(scope_conditions).merge :slug.like => "#{s}-%")
           end.flatten.map do |r|
             index = r.slug.gsub /^(#{slugs.join '|'})-/, ''
             index =~ /\d+/ ? index.to_i : nil
           end.compact.max
 
           new_index = if max_index.nil?
-            self.class.first(not_self_conditions.merge :slug => base_slug).present? ? 2 : 1
+            self.class.first(not_self_conditions.merge(scope_conditions).merge :slug => base_slug).present? ? 2 : 1
           else
             max_index + 1
           end
