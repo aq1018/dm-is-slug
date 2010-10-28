@@ -1,6 +1,7 @@
 require 'unidecode'
 require 'dm-core'
 require 'dm-core/support/chainable'
+require 'dm-validations'
 
 module DataMapper
   module Is
@@ -89,8 +90,7 @@ module DataMapper
           validates_uniqueness_of :slug, scope_options
         end
 
-        before respond_to?(:valid?) ? :valid? : :save, :generate_slug
-        before :save, :generate_slug
+        before :valid?, :generate_slug
       end
 
       module ClassMethods
