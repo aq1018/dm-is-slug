@@ -152,8 +152,15 @@ module DataMapper
         # The slug is not stale if
         # 1. the slug is permanent, and slug column has something valid in it
         # 2. the slug source value is nil or empty
+        # 3. scope is not changed
         def stale_slug?
-          !((permanent_slug? && !slug.blank?) || slug_source_value.blank?)
+          !(
+            (permanent_slug? && !slug.blank?) ||
+            slug_source_value.blank?
+          ) ||
+          !(!new? && (dirty_attributes.keys.map(&:name) &
+                      (self.class.slug_options[:scope] || [])).compact.blank?
+          )
         end
 
         private

@@ -45,6 +45,7 @@ describe DataMapper::Is::Slug do
       include DataMapper::Resource
       property :id, Serial
       property :title, String
+      property :description, String
       property :category, String
 
       is :slug, :source => :title, :scope => :category
@@ -303,6 +304,30 @@ describe DataMapper::Is::Slug do
 
         t2 = Task.create :category => 'programming', :title => 'fix'
         t2.slug.should == 'fix-2'
+      end
+
+      it 'should recalculate slug upon change of scope' do
+        t1 = Task.create :category => 'programming', :title => 'fix'
+        t1.slug.should == 'fix'
+
+        t2 = Task.create :category => 'plumbing', :title => 'fix'
+        t2.slug.should == 'fix'
+
+        t2.category = 'programming'
+        t2.save
+        t2.slug.should == 'fix-2'
+      end
+
+      it 'should keep slug if scope did not change' do
+        t1 = Task.create :category => 'programming', :title => 'fix'
+        t1.slug.should == 'fix'
+
+        t2 = Task.create :category => 'plumbing', :title => 'fix'
+        t2.slug.should == 'fix'
+
+        t2.description = 'copper pipes are good'
+        t2.save
+        t2.slug.should == 'fix'
       end
     end
   end
