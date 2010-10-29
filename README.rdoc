@@ -42,9 +42,23 @@ DataMapper plugin for creating and slugs(permalinks).
     is :slug, :source => :slug_for_email, :size => 255
   end
 
+=== Scoped slugs
+
+  class Post
+    include DataMapper::Resource
+
+    property :id, Serial
+    property :title, String
+    property :content, String
+    property :category, String
+
+    # Same as above but slugs will be unique only within their category.
+    is :slug, :source => :title, :slug => :category
+  end
+
 === Finding objects by slug
 
- post = Post.first(:slug => "your_slug")
+  post = Post.first(:slug => "your_slug")
 
 == Development
 
