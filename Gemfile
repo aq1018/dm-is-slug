@@ -68,7 +68,7 @@
 # is added to the .gitignore file, so you don't need to worry about accidentally checking
 # it into version control.
 
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 DATAMAPPER = 'git://github.com/datamapper'
 DM_VERSION = '~> 1.0.2'
