@@ -1,4 +1,4 @@
-require 'unidecode'
+require 'unidecoder'
 require 'dm-core'
 require 'dm-core/support/chainable'
 require 'dm-validations'

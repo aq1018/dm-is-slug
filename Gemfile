@@ -84,7 +84,7 @@ group :runtime do # Runtime dependencies (as in the gemspec)
   gem 'dm-core',         DM_VERSION
   gem 'dm-validations',  DM_VERSION
 
-  gem 'unidecode',         '~> 1.0.0'
+  gem 'unidecoder',      :github => 'norman/unidecoder'
 
 end
 
