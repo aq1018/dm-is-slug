@@ -69,7 +69,7 @@ describe DataMapper::Is::Slug do
     end
   end
 
-  supported_by :sqlite, :mysql, :postgres do
+  supported_by :in_memory, :yaml, :sqlite, :mysql, :postgres do
 
     before :all do
       DataMapper.repository do

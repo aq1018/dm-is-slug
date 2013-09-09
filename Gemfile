@@ -68,7 +68,7 @@
 # is added to the .gitignore file, so you don't need to worry about accidentally checking
 # it into version control.
 
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 DATAMAPPER = 'git://github.com/datamapper'
 DM_VERSION = '~> 1.0.2'
@@ -81,17 +81,17 @@ group :runtime do # Runtime dependencies (as in the gemspec)
     gem 'activesupport', '~> 3.0.0',  :git => 'git://github.com/rails/rails.git', :branch => '3-0-stable', :require => nil
   end
 
-  gem 'dm-core',         DM_VERSION, :git => "#{DATAMAPPER}/dm-core.git"
-  gem 'dm-validations',  DM_VERSION, :git => "#{DATAMAPPER}/dm-validations.git"
+  gem 'dm-core',         DM_VERSION
+  gem 'dm-validations',  DM_VERSION
 
-  gem 'unidecode',         '~> 1.0.0'
+  gem 'unidecoder',      :github => 'norman/unidecoder'
 
 end
 
 group(:development) do # Development dependencies (as in the gemspec)
 
   gem 'rake',           '~> 0.8.7'
-  gem 'rspec',          '~> 1.3', :git => 'git://github.com/snusnu/rspec', :branch => 'heckle_fix_plus_gemfile'
+  gem 'rspec',          '~> 1.3'
   gem 'jeweler',        '~> 1.4'
 
 end
@@ -126,18 +126,19 @@ group :datamapper do # We need this because we want to pin these dependencies to
       gem "do_#{adapter}", DO_VERSION, options.dup
     end
 
-    gem 'dm-do-adapter', DM_VERSION, :git => "#{DATAMAPPER}/dm-do-adapter.git"
+    gem 'dm-do-adapter', DM_VERSION
   end
 
   adapters.each do |adapter|
-    gem "dm-#{adapter}-adapter", DM_VERSION, :git => "#{DATAMAPPER}/dm-#{adapter}-adapter.git"
+    gem "dm-#{adapter}-adapter", DM_VERSION
   end
 
-  plugins = ENV['PLUGINS'] || ENV['PLUGIN']
-  plugins = plugins.to_s.tr(',', ' ').split.push('dm-migrations').uniq
+  plugins = ENV['PLUGIN'] || ''
+  plugins = ENV['PLUGINS'] || plugins
+  plugins = plugins.to_s.tr(',', ' ').split(' ').push('dm-migrations').uniq
 
   plugins.each do |plugin|
-    gem plugin, DM_VERSION, :git => "#{DATAMAPPER}/#{plugin}.git"
+    gem plugin, DM_VERSION
   end
 
 end
