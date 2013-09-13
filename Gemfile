@@ -92,7 +92,7 @@ group(:development) do # Development dependencies (as in the gemspec)
 
   gem 'rake',           '~> 0.8.7'
   gem 'rspec',          '~> 1.3'
-  gem 'jeweler',        '~> 1.4'
+  gem 'jeweler',        '~> 1.8'
 
 end
 
