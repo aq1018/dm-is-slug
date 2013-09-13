@@ -211,7 +211,7 @@ module DataMapper
           end.compact.max
 
           new_index = if max_index.nil?
-            self.class.first(not_self_conditions.merge(scope_conditions).merge :slug => base_slug).present? ? 2 : 1
+            self.class.first(not_self_conditions.merge(scope_conditions).merge :slug => base_slug).blank? ? 1 : 2
           else
             max_index + 1
           end
