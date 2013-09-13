@@ -13,7 +13,7 @@ gemfile:
 env:
   - ADAPTER='sqlite'
   - ADAPTER='postgres' DM_DB_USER='postgres' DM_DB_PASSWORD=''
-  - ADAPTER=mysql DM_DB_USER='mysql' DM_DB_PASSWORD=''
+  - ADAPTER=mysql DM_DB_USER='travis' DM_DB_PASSWORD=''
 
 rvm:
   - 1.9.3
