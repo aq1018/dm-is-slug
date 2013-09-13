@@ -1,4 +1,5 @@
 {<img src="https://badge.fury.io/rb/dm-is-slug.png" alt="Gem Version" />}[http://badge.fury.io/rb/dm-is-slug]
+{<img src="https://gemnasium.com/aq1018/dm-is-slug.png" alt="Dependency Status" />}[https://gemnasium.com/aq1018/dm-is-slug]
 {<img src="https://travis-ci.org/aq1018/dm-is-slug.png" />}[https://travis-ci.org/aq1018/dm-is-slug]
 {<img src="https://codeclimate.com/github/aq1018/dm-is-slug.png" />}[https://codeclimate.com/github/aq1018/dm-is-slug]
 {<img src="https://coveralls.io/repos/aq1018/dm-is-slug/badge.png?branch=master" alt="Coverage Status" />}[https://coveralls.io/r/aq1018/dm-is-slug?branch=master]
