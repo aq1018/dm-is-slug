@@ -1,3 +1,8 @@
+{<img src="https://badge.fury.io/rb/dm-is-slug.png" alt="Gem Version" />}[http://badge.fury.io/rb/dm-is-slug]
+{<img src="https://travis-ci.org/aq1018/dm-is-slug.png" />}[https://travis-ci.org/aq1018/dm-is-slug]
+{<img src="https://codeclimate.com/github/aq1018/dm-is-slug.png" />}[https://codeclimate.com/github/aq1018/dm-is-slug]
+
+
 = dm-is-slug
 
 DataMapper plugin for creating and slugs(permalinks).
@@ -30,13 +35,13 @@ DataMapper plugin for creating and slugs(permalinks).
     property :id, Serial
     property :email, String
     property :password, String
-  
-    # we only want to strip out the domain name 
+
+    # we only want to strip out the domain name
     # and use only the email account name as the permalink
     def slug_for_email
       email.split("@").first
     end
-  
+
     # here we define that it should have a slug that uses title as the permalink
     # it will generate an extra slug property of String type, with the same size as title
     is :slug, :source => :slug_for_email, :size => 255
