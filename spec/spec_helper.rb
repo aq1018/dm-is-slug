@@ -1,5 +1,8 @@
 require 'rubygems'
 
+require 'coveralls'
+Coveralls.wear!
+
 require 'dm-core/spec/setup'
 require 'dm-core/spec/lib/adapter_helpers'
 
