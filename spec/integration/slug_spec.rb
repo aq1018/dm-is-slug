@@ -58,6 +58,14 @@ describe DataMapper::Is::Slug do
       is :slug, :source => :title, :key => true
     end
 
+    class ::SlugField
+      include DataMapper::Resource
+      property :id, Serial
+      property :title, String
+
+      is :slug, :source => :title, :field => :custom_slug
+    end
+
     class ::Post2
       include DataMapper::Resource
 
@@ -95,6 +103,7 @@ describe DataMapper::Is::Slug do
         end
 
         @sk = SlugKey.create(:title => 'slug key')
+        @sf = SlugField.create(:title => 'slug field')
 
         @post1 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
         @post2 = Post.create :user => @u1, :title => 'a' * Post.slug_property.length
@@ -251,6 +260,11 @@ describe DataMapper::Is::Slug do
     it 'should work with key on slug and validations' do
       @sk.title.should == 'slug key'
       @sk.slug.should == 'slug-key'
+    end
+
+    it 'should work with custom field for slug property' do
+      @sf.title.should == 'slug field'
+      @sf.custom_slug.should == 'slug-field'
     end
 
     it 'should have slug no longer than slug_property.length' do

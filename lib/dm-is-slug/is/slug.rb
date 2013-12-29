@@ -73,6 +73,7 @@ module DataMapper
 
         @slug_options[:unique] = options.delete(:unique) || false
 
+        @slug_options[:field] = options.delete(:field)
         @slug_options[:source] = options.delete(:source)
         raise InvalidSlugSourceError, 'You must specify a :source to generate slug.' unless slug_source
 
@@ -81,13 +82,13 @@ module DataMapper
         if slug_property && slug_property.class >= DataMapper::Property::String
             options.merge! slug_property.options
         end
-        property :slug, String, options
+        property slug_field, String, options
 
         if @slug_options[:unique]
           scope_options = @slug_options[:scope] && @slug_options[:scope].any? ?
             {:scope => @slug_options[:scope]} : {}
 
-          validates_uniqueness_of :slug, scope_options
+          validates_uniqueness_of slug_field, scope_options
         end
 
         before :valid?, :generate_slug
@@ -99,6 +100,10 @@ module DataMapper
         def permanent_slug?
           slug_options[:permanent_slug]
         end
+        
+        def slug_field
+          slug_options[:field] ? slug_options[:field].to_sym : :slug
+        end
 
         def slug_source
           slug_options[:source] ? slug_options[:source].to_sym : nil
@@ -109,7 +114,7 @@ module DataMapper
         end
 
         def slug_property
-          detect_slug_property_by_name(:slug)
+          detect_slug_property_by_name(slug_field)
         end
 
         private
@@ -126,11 +131,15 @@ module DataMapper
 
       module InstanceMethods
         def to_param
-          [slug]
+          [slug_value]
         end
 
         def permanent_slug?
           self.class.permanent_slug?
+        end
+        
+        def slug_field
+          self.class.slug_field
         end
 
         def slug_source
@@ -144,6 +153,10 @@ module DataMapper
         def slug_property
           self.class.slug_property
         end
+        
+        def slug_value
+          self.send(slug_field)
+        end
 
         def slug_source_value
           self.send(slug_source)
@@ -155,7 +168,7 @@ module DataMapper
         # 3. scope is not changed
         def stale_slug?
           !(
-            (permanent_slug? && !slug.blank?) ||
+            (permanent_slug? && !slug_value.blank?) ||
             slug_source_value.blank?
           ) ||
           !(!new? && (dirty_attributes.keys.map(&:name) &
@@ -169,7 +182,7 @@ module DataMapper
           return unless self.class.respond_to?(:slug_options) && self.class.slug_options
           raise InvalidSlugSourceError, 'Invalid slug source.' unless slug_source_property || self.respond_to?(slug_source)
           return unless stale_slug?
-          attribute_set :slug, unique_slug
+          attribute_set slug_field, unique_slug
         end
 
         def unique_slug
@@ -204,14 +217,14 @@ module DataMapper
           end
 
           max_index = slugs.map do |s|
-            self.class.all(not_self_conditions.merge(scope_conditions).merge :slug.like => "#{s}-%")
+            self.class.all(not_self_conditions.merge(scope_conditions).merge slug_field.like => "#{s}-%")
           end.flatten.map do |r|
-            index = r.slug.gsub /^(#{slugs.join '|'})-/, ''
+            index = r.slug_value.gsub /^(#{slugs.join '|'})-/, ''
             index =~ /\d+/ ? index.to_i : nil
           end.compact.max
 
           new_index = if max_index.nil?
-            self.class.first(not_self_conditions.merge(scope_conditions).merge :slug => base_slug).blank? ? 1 : 2
+            self.class.first(not_self_conditions.merge(scope_conditions).merge slug_field => base_slug).blank? ? 1 : 2
           else
             max_index + 1
           end
